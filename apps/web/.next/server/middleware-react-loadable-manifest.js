@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST="{\"app\\\\(learn)\\\\dashboard\\\\login\\\\PageClient.tsx -> next-auth/react\":{\"id\":\"app\\\\(learn)\\\\dashboard\\\\login\\\\PageClient.tsx -> next-auth/react\",\"files\":[]}}"

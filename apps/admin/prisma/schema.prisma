@@ -1,0 +1,690 @@
+// Amar Talim — Prisma schema (Next.js migration ready)
+//
+// Migration path:
+//   1. Move this file to prisma/schema.prisma at the Next.js project root.
+//   2. Add DATABASE_URL + DIRECT_URL (Neon) to .env.
+//   3. Run: pnpm prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")   // Neon pooled
+  directUrl = env("DIRECT_URL")     // Neon direct (migrations)
+}
+
+// ─── Roles ─────────────────────────────────────────
+enum Role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+// ─── NextAuth ──────────────────────────────────────
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  role          Role      @default(STUDENT)
+  locale        String    @default("bn")
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts       Account[]
+  sessions       Session[]
+  blogs          Blog[]        @relation("BlogAuthor")
+  courses        Course[]      @relation("CourseInstructor")
+  enrollments    Enrollment[]
+  progress       Progress[]
+  certificates   Certificate[]
+  payments       Payment[]
+  comments       Comment[]
+  quizAttempts   QuizAttempt[]
+  couponRedemptions CouponRedemption[]
+  qaQuestions    QaPost[]      @relation("UserQuestions")
+  wishlists      Wishlist[]
+  bookmarks      Bookmark[]
+  roleApplications RoleApplication[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Magazine / Blog ───────────────────────────────
+model BlogCategory {
+  id          String         @id @default(cuid())
+  name        String
+  slug        String         @unique
+  description String?        @db.Text
+  color       String?
+  parentId    String?
+  parent      BlogCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    BlogCategory[] @relation("CategoryHierarchy")
+  blogs       Blog[]
+  createdAt   DateTime       @default(now())
+}
+
+// ─── Public Author (separate from User; admin-curated) ────
+enum AuthorStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+model Author {
+  id         String       @id @default(cuid())
+  name       String
+  slug       String       @unique
+  email      String       @unique
+  phone      String?
+  avatar     String?      // Cloudinary URL
+  bio        String       @db.Text
+  shortBio   String?      // 2-3 lines, shown on card
+  expertise  String[]     // ["আরবি সাহিত্য", "নাহু"]
+  facebook   String?
+  twitter    String?
+  website    String?
+  status     AuthorStatus @default(PENDING)
+  reviewNote String?
+  reviewedBy String?
+  blogs      Blog[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@index([status])
+  @@index([slug])
+}
+
+model Blog {
+  id          String        @id @default(cuid())
+  title       String
+  slug        String        @unique
+  excerpt     String?
+  content     String        @db.Text
+  coverImage  String?
+  published   Boolean       @default(false)
+  publishedAt DateTime?
+  views       Int           @default(0)
+  featured    Boolean       @default(false)
+  showToc     Boolean       @default(true)
+  faq         Json?         // Array of { q, a } objects for FAQ schema
+  readingTime Int?
+
+  // System author (login user) — optional now that public Author exists
+  authorId    String?
+  author      User?         @relation("BlogAuthor", fields: [authorId], references: [id])
+
+  // Public author profile (curated)
+  authorProfileId  String?
+  authorProfile    Author?  @relation(fields: [authorProfileId], references: [id])
+  hasAuthorProfile Boolean  @default(false)
+
+  categoryId  String?
+  category    BlogCategory? @relation(fields: [categoryId], references: [id])
+
+  tags        String[]
+  comments    Comment[]
+  bookmarks   Bookmark[]
+
+  // Soft delete
+  deletedAt   DateTime?
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([published, publishedAt])
+  @@index([deletedAt])
+  @@index([authorProfileId])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blogId    String
+  blog      Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, blogId])
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  SPAM
+  REJECTED
+}
+
+model Comment {
+  id        String        @id @default(cuid())
+  content   String        @db.Text
+  blogId    String
+  blog      Blog          @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    CommentStatus @default(PENDING)
+
+  // Nested replies (1 level or threaded)
+  parentId  String?
+  parent    Comment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[]     @relation("CommentReplies")
+
+  // Engagement
+  likes     Int           @default(0)
+
+  // Soft delete
+  deletedAt DateTime?
+
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([blogId, status, createdAt])
+  @@index([parentId])
+}
+
+// ─── LMS ───────────────────────────────────────────
+model CourseCategory {
+  id      String   @id @default(cuid())
+  name    String
+  slug    String   @unique
+  courses Course[]
+}
+
+model Course {
+  id           String          @id @default(cuid())
+  title        String
+  slug         String          @unique
+  description  String          @db.Text
+  thumbnail    String?
+  price        Int             @default(0)        // BDT (taka)
+  currency     String          @default("BDT")
+  published    Boolean         @default(false)
+
+  // Denormalized counters
+  studentCount Int             @default(0)
+  rating       Float?
+  reviewCount  Int             @default(0)
+
+  // Reserved for future multi-tenancy
+  organizationId String?
+
+  instructorId String
+  instructor   User            @relation("CourseInstructor", fields: [instructorId], references: [id])
+
+  categoryId   String?
+  category     CourseCategory? @relation(fields: [categoryId], references: [id])
+
+  topics       CourseTopic[]
+  lessons      Lesson[]
+  assignments  Assignment[]
+  enrollments  Enrollment[]
+  certificates Certificate[]
+  coupons      Coupon[]
+  wishlists    Wishlist[]
+
+  // Soft delete
+  deletedAt    DateTime?
+
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@index([published, deletedAt])
+  @@index([organizationId])
+}
+
+model CourseTopic {
+  id          String   @id @default(cuid())
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  order       Int
+
+  lessons     Lesson[]
+  quizzes     Quiz[]
+  assignments Assignment[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([courseId, order])
+}
+
+model Assignment {
+  id          String      @id @default(cuid())
+  courseId    String
+  course      Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  topicId     String
+  topic       CourseTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  title       String
+  description String?     @db.Text
+  totalMarks  Int         @default(100)
+  passMarks   Int         @default(33)
+  order       Int
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([topicId, order])
+}
+
+model Lesson {
+  id            String     @id @default(cuid())
+  courseId      String
+  course        Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  topicId       String?
+  topic         CourseTopic? @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  title         String
+  description   String?    @db.Text
+  videoId       String?
+  duration      Int?
+  order         Int
+  isFreePreview Boolean    @default(false)
+
+  quiz          Quiz?
+  progress      Progress[]
+
+  @@index([courseId, order])
+  @@index([topicId, order])
+}
+
+model Quiz {
+  id           String         @id @default(cuid())
+  lessonId     String?        @unique
+  lesson       Lesson?        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  topicId      String?
+  topic        CourseTopic?   @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  title        String?
+  description  String?        @db.Text
+  passScore    Int            @default(70)
+  timeLimit    Int?           // seconds; null = no limit
+  maxAttempts  Int?           // null = unlimited
+  shuffle      Boolean        @default(false)
+  questions    QuizQuestion[]
+  attempts     QuizAttempt[]
+  order        Int            @default(0)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([topicId, order])
+}
+
+enum QuizQuestionType {
+  SINGLE
+  MULTIPLE
+  TRUE_FALSE
+}
+
+model QuizQuestion {
+  id       String           @id @default(cuid())
+  quizId   String
+  quiz     Quiz             @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  type     QuizQuestionType @default(SINGLE)
+  question String           @db.Text
+  options  String[]
+  // Indices of correct options (supports SINGLE/MULTIPLE/TRUE_FALSE)
+  answers  Int[]
+  points   Int              @default(1)
+  explanation String?       @db.Text
+  order    Int
+
+  @@index([quizId, order])
+}
+
+enum QuizAttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  PASSED
+  FAILED
+  EXPIRED
+}
+
+model QuizAttempt {
+  id          String            @id @default(cuid())
+  quizId      String
+  quiz        Quiz              @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status      QuizAttemptStatus @default(IN_PROGRESS)
+  score       Int               @default(0)
+  maxScore    Int               @default(0)
+  percentage  Int               @default(0)
+  passed      Boolean           @default(false)
+  attemptNo   Int               @default(1)
+  startedAt   DateTime          @default(now())
+  submittedAt DateTime?
+  // [{ questionId, selected: number[], correct: bool, pointsAwarded }]
+  answers     Json?
+
+  @@unique([quizId, userId, attemptNo])
+  @@index([userId, quizId])
+}
+
+model Enrollment {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  courseId   String
+  course     Course    @relation(fields: [courseId], references: [id])
+  enrolledAt DateTime  @default(now())
+  // For future subscription model (null = lifetime access)
+  expiresAt  DateTime?
+  paymentId  String?
+  payment    Payment?  @relation(fields: [paymentId], references: [id])
+
+  @@unique([userId, courseId])
+  @@index([expiresAt])
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, courseId])
+  @@index([userId])
+}
+
+model Progress {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  lessonId  String
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+  completed Boolean  @default(false)
+  score     Int?
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, lessonId])
+}
+
+model Certificate {
+  id       String   @id @default(cuid())
+  userId   String
+  user     User     @relation(fields: [userId], references: [id])
+  courseId String
+  course   Course   @relation(fields: [courseId], references: [id])
+  issuedAt DateTime @default(now())
+  code     String   @unique
+}
+
+// ─── Library (Moved to bottom) ─────────────────────
+// ─── Payments ──────────────────────────────────────
+enum PaymentProvider {
+  BKASH
+  NAGAD
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+model Payment {
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+  provider    PaymentProvider
+  amount      Int
+  currency    String          @default("BDT")
+  status      PaymentStatus   @default(PENDING)
+  trxId       String?         @unique
+  providerRef String?
+  meta        Json?
+  enrollments Enrollment[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+// ─── Coupons / Discounts ───────────────────────────
+enum CouponType {
+  PERCENT     // value = 0-100
+  FIXED       // value = amount in BDT
+}
+
+enum CouponScope {
+  ALL_COURSES
+  SPECIFIC_COURSES
+}
+
+model Coupon {
+  id              String       @id @default(cuid())
+  code            String       @unique
+  description     String?
+  type            CouponType
+  value           Int          // percent (1-100) or fixed BDT
+  scope           CouponScope  @default(ALL_COURSES)
+
+  // Limits
+  maxRedemptions  Int?         // null = unlimited
+  maxPerUser      Int          @default(1)
+  minOrderAmount  Int?         // BDT
+  redeemedCount   Int          @default(0)
+
+  // Validity
+  startsAt        DateTime?
+  expiresAt       DateTime?
+  active          Boolean      @default(true)
+
+  // Specific course targeting (when scope = SPECIFIC_COURSES)
+  courses         Course[]
+  redemptions     CouponRedemption[]
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([active, expiresAt])
+}
+
+model CouponRedemption {
+  id         String   @id @default(cuid())
+  couponId   String
+  coupon     Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paymentId  String?
+  discount   Int      // BDT amount actually discounted
+  redeemedAt DateTime @default(now())
+
+  @@index([couponId, userId])
+}
+
+// ─── Settings ──────────────────────────────────────
+model SiteSetting {
+  key   String @id
+  value Json
+}
+
+// ─── Islamic QA (আপনার জিজ্ঞাসা) ─────────────────────
+
+enum QaStatus {
+  PENDING
+  ANSWERED
+  PUBLISHED
+  REJECTED
+}
+
+model QaCategory {
+  id          String        @id @default(cuid())
+  name        String
+  slug        String        @unique
+  description String?       @db.Text
+  parentId    String?
+  parent      QaCategory?   @relation("QaCategoryHierarchy", fields: [parentId], references: [id])
+  children    QaCategory[]  @relation("QaCategoryHierarchy")
+  qas         QaPost[]
+  createdAt   DateTime      @default(now())
+}
+
+model Mufti {
+  id         String       @id @default(cuid())
+  name       String
+  slug       String       @unique
+  email      String?      @unique
+  phone      String?
+  avatar     String?      // Cloudinary URL
+  bio        String       @db.Text
+  shortBio   String?
+  expertise  String[]
+  status     AuthorStatus @default(PENDING) // Reusing AuthorStatus for simplicity
+  qas        QaPost[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
+
+model QaPost {
+  id              String      @id @default(cuid())
+  title           String      // Question summary / title
+  slug            String      @unique
+  questionDetails String?     @db.Text
+  answer          String?     @db.Text
+  status          QaStatus    @default(PENDING)
+  views           Int         @default(0)
+  
+  // Asker info (if submitted by public)
+  askerId         String?
+  asker           User?       @relation("UserQuestions", fields: [askerId], references: [id])
+  askerName       String?
+  askerEmail      String?     // For guest submissions
+  
+  // Answerer (Mufti)
+  muftiId         String?
+  mufti           Mufti?      @relation(fields: [muftiId], references: [id])
+  
+  categoryId      String?
+  category        QaCategory? @relation(fields: [categoryId], references: [id])
+  
+  tags            String[]
+  
+  publishedAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([status])
+  @@index([categoryId])
+  @@index([muftiId])
+}
+
+// ─── Books Library ──────────────────────────────────
+model BookCategory {
+  id          String         @id @default(cuid())
+  name        String
+  slug        String         @unique
+  description String?        @db.Text
+  parentId    String?
+  parent      BookCategory?  @relation("BookCategoryHierarchy", fields: [parentId], references: [id])
+  children    BookCategory[] @relation("BookCategoryHierarchy")
+  books       Book[]
+  createdAt   DateTime       @default(now())
+}
+
+model Book {
+  id            String        @id @default(cuid())
+  title         String
+  slug          String        @unique
+  author        String
+  cover         String?
+  description   String?       @db.Text
+  pages         Int           @default(0)
+  rating        Float         @default(0)
+  readers       Int           @default(0)
+  publishDate   String?
+  language      String        @default("বাংলা")
+  isFree        Boolean       @default(true)
+  status        String        @default("published") // "draft" | "published"
+  
+  categoryId    String?
+  category      BookCategory? @relation(fields: [categoryId], references: [id])
+  subcategory   String?       // Storing subcategory name directly or we could use another Category relation
+  
+  chapters      BookChapter[]
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([status])
+  @@index([categoryId])
+}
+
+model BookChapter {
+  id          String   @id @default(cuid())
+  title       String
+  content     String   @db.Text
+  image       String?
+  orderIndex  Int      @default(0)
+  
+  bookId      String
+  book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([bookId])
+}
+
+// ─── Applications ──────────────────────────────────
+enum ApplicationRole {
+  INSTRUCTOR
+  AUTHOR
+  MUFTI
+}
+
+model RoleApplication {
+  id         String          @id @default(cuid())
+  userId     String
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role       ApplicationRole
+  name       String
+  phone      String?
+  bio        String          @db.Text
+  expertise  String[]
+  meta       Json?
+  adminNote  String?         @db.Text
+  status     AuthorStatus    @default(PENDING)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@unique([userId, role])
+}

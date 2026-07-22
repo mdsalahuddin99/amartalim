@@ -1,0 +1,12 @@
+{
+  "/(marketing)/page": "app/(marketing)/page.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/(auth)/register/page": "app/(auth)/register/page.js",
+  "/(learn)/dashboard/page": "app/(learn)/dashboard/page.js",
+  "/(learn)/dashboard/login/page": "app/(learn)/dashboard/login/page.js",
+  "/author/page": "app/author/page.js",
+  "/api/auth/verify-credentials/route": "app/api/auth/verify-credentials/route.js",
+  "/author/blogs/page": "app/author/blogs/page.js",
+  "/(marketing)/blogs/[slug]/page": "app/(marketing)/blogs/[slug]/page.js"
+}

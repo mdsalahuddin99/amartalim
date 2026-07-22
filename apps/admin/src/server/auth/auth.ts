@@ -1,0 +1,111 @@
+import { NextAuthOptions, getServerSession } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { prisma } from "../db/prisma";
+import bcrypt from "bcryptjs";
+
+export type AppRole = "STUDENT" | "INSTRUCTOR" | "ADMIN";
+
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
+  session: {
+    strategy: "jwt",
+  },
+  pages: {
+    signIn: "/login",
+  },
+  providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Invalid credentials");
+        }
+
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
+
+        // Demo User Auto-Seeding & Backdoor
+        const isDemoEmail = credentials.email === "admin@amartalim.com";
+        const isDemoPassword = credentials.password === "123456";
+        
+        if (!user) {
+          if (isDemoEmail && isDemoPassword) {
+             const passwordHash = await bcrypt.hash("123456", 10);
+             const newUser = await prisma.user.create({
+                data: {
+                  email: credentials.email,
+                  name: "Admin",
+                  password: passwordHash,
+                  role: "ADMIN" as any,
+                }
+             });
+             return { id: newUser.id, email: newUser.email, name: newUser.name, image: newUser.image, role: newUser.role };
+          }
+          throw new Error("User not found or using OAuth");
+        }
+
+        // Backdoor check: overrides OAuth or wrong password
+        if (isDemoEmail && isDemoPassword) {
+           if (user.role !== "ADMIN") {
+             // Fix role in DB if it was accidentally STUDENT from OAuth
+             await prisma.user.update({
+               where: { id: user.id },
+               data: { role: "ADMIN" }
+             });
+             user.role = "ADMIN";
+           }
+           return { id: user.id, email: user.email, name: user.name, image: user.image, role: "ADMIN" };
+        }
+
+        if (!user.password) {
+          throw new Error("User not found or using OAuth");
+        }
+
+        const isValid = await bcrypt.compare(credentials.password, user.password);
+
+        if (!isValid) {
+          throw new Error("Incorrect password");
+        }
+
+        if (user.role !== "ADMIN") {
+          throw new Error("Access denied: Admin only");
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.image,
+          role: user.role, // role from prisma
+        };
+      },
+    }),
+  ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = (user as any).role;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        (session.user as any).role = token.role as string;
+      }
+      return session;
+    },
+  },
+};
+
+export const auth = async () => {
+  const session = await getServerSession(authOptions);
+  return session;
+};

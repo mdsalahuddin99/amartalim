@@ -1,0 +1,302 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Bengali fonts — self-hosted (NO external CDN).
+   Google Fonts / fonts.maateen.me are blocked or unreliable on many
+   Bangladesh/EMUI/UC/Huawei devices, which is what caused যুক্তাক্ষর to
+   collapse into stacked glyphs. We ship the woff2 files from /public/fonts
+   so the user device never has to reach the open internet for fonts.
+   These are variable fonts: one file covers weights 400–700.
+   ─────────────────────────────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Kalpurush';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/Kalpurush.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Noto Sans Bengali';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/noto-sans-bengali.woff2') format('woff2');
+  unicode-range: U+0951-0952, U+0964-0965, U+0980-09FE, U+200C-200D, U+20B9, U+25CC, U+A8F1;
+}
+
+
+@layer base {
+  :root {
+    /* Updated background to a very soft cream/green tint instead of stark white */
+    --background: 130 15% 98.5%;
+    --foreground: 0 0% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 20%;
+    /* ... rest of the vars stay same for now ... */
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 20%;
+
+    --primary: 131 60% 32%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 150 10% 94%;
+    --secondary-foreground: 0 0% 20%;
+
+    --muted: 150 8% 93%;
+    --muted-foreground: 0 0% 40%;
+
+    --accent: 51 100% 50%;
+    --accent-foreground: 0 0% 15%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 51 100% 50%;
+    --warning-foreground: 0 0% 15%;
+
+    --info: 210 100% 56%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 150 8% 88%;
+    --input: 150 8% 88%;
+    --ring: 131 60% 32%;
+
+    --radius: 0.625rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 30%;
+    --sidebar-primary: 131 60% 32%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 150 10% 94%;
+    --sidebar-accent-foreground: 0 0% 20%;
+    --sidebar-border: 150 8% 88%;
+    --sidebar-ring: 131 60% 32%;
+
+    --neon-emerald: 135 60% 30%;
+    --neon-teal: 127 56% 40%;
+    --neon-gold: 92 53% 51%;
+    --neon-violet: 92 60% 60%;
+
+    --brand-dark: 135 60% 25%;
+    --brand-mid: 127 56% 38%;
+    --brand-light: 92 53% 51%;
+    --brand-glow: 92 70% 65%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(135 60% 25%), hsl(127 56% 38%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(120 20% 97%));
+    --gradient-subtle: linear-gradient(135deg, hsl(120 20% 95%), hsl(120 25% 90%));
+    --gradient-accent: linear-gradient(135deg, hsl(92 53% 51%), hsl(127 56% 40%));
+    --gradient-neon: linear-gradient(135deg, hsl(135 60% 25%), hsl(127 56% 40%) 50%, hsl(92 53% 55%));
+    --gradient-mesh: radial-gradient(at 20% 20%, hsl(135 65% 20% / 0.85) 0px, transparent 50%), radial-gradient(at 80% 0%, hsl(127 60% 28% / 0.75) 0px, transparent 50%), radial-gradient(at 80% 80%, hsl(92 60% 35% / 0.55) 0px, transparent 50%), radial-gradient(at 0% 90%, hsl(135 70% 18% / 0.7) 0px, transparent 50%);
+    --gradient-aurora: conic-gradient(from 180deg at 50% 50%, hsl(135 60% 30% / 0.5), hsl(127 56% 40% / 0.5), hsl(92 53% 51% / 0.45), hsl(135 60% 25% / 0.5), hsl(135 60% 30% / 0.5));
+    --shadow-sm: 0 1px 3px hsl(0 0% 0% / 0.04);
+    --shadow-md: 0 4px 20px hsl(0 0% 0% / 0.06);
+    --shadow-lg: 0 8px 30px hsl(0 0% 0% / 0.08);
+    --shadow-xl: 0 16px 50px hsl(0 0% 0% / 0.1);
+    --shadow-neon-emerald: 0 0 30px hsl(135 60% 30% / 0.5), 0 0 60px hsl(127 56% 40% / 0.3);
+    --shadow-neon-gold: 0 0 30px hsl(92 53% 51% / 0.5), 0 0 60px hsl(92 60% 60% / 0.3);
+    --shadow-neon-teal: 0 0 30px hsl(127 56% 40% / 0.5), 0 0 60px hsl(135 60% 30% / 0.25);
+  }
+
+
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html, body {
+    @apply bg-background text-foreground antialiased;
+    overflow-x: hidden;
+    max-width: 100vw;
+    scrollbar-gutter: stable;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: 'Kalpurush', 'Noto Sans Bengali', system-ui, sans-serif;
+    text-rendering: auto;
+    background-image: radial-gradient(hsl(var(--primary) / 0.07) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: 0 0;
+  }
+  img, video, iframe { max-width: 100%; height: auto; }
+  h1, h2, h3, h4, .font-serif-bn {
+    /* Single Bengali font everywhere — Kalpurush shapes যুক্তাক্ষর correctly. */
+    font-family: 'Kalpurush', 'Noto Sans Bengali', system-ui, sans-serif;
+    font-kerning: normal;
+  }
+}
+
+@layer utilities {
+  .premium-card {
+    @apply bg-gradient-to-br from-white to-green-50/50 shadow-sm border border-primary/5 transition-all duration-300;
+  }
+  .premium-card:hover {
+    @apply shadow-md border-primary/15 to-green-50/80;
+  }
+  
+  .font-serif-bn { font-family: 'Kalpurush', 'Noto Sans Bengali', system-ui, sans-serif; }
+  .font-sans-bn { font-family: 'Kalpurush', 'Noto Sans Bengali', system-ui, sans-serif; }
+
+  /* Editorial drop cap */
+  .drop-cap > p:first-of-type::first-letter {
+    @apply font-serif-bn;
+    float: left;
+    font-size: 4.5rem;
+    line-height: 0.85;
+    padding: 0.35rem 0.6rem 0 0;
+    font-weight: 800;
+    color: hsl(var(--primary));
+  }
+  /* Magazine column rule */
+  .rule-top { border-top: 3px double hsl(var(--foreground)); }
+  .rule-bottom { border-bottom: 3px double hsl(var(--foreground)); }
+  .rule-thin { border-top: 1px solid hsl(var(--foreground) / 0.15); }
+  .eyebrow {
+    @apply text-[11px] font-bold uppercase tracking-[0.18em] text-primary;
+  }
+  .editorial-link {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    transition: background-size 0.3s ease;
+  }
+  .editorial-link:hover { background-size: 100% 1px; }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-hero);
+  }
+  .text-gradient-neon {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-neon);
+  }
+  .bg-gradient-hero { background-image: var(--gradient-hero); }
+  .bg-gradient-card { background-image: var(--gradient-card); }
+  .bg-gradient-subtle { background-image: var(--gradient-subtle); }
+  .bg-gradient-neon { background-image: var(--gradient-neon); }
+  .bg-gradient-mesh { background-image: var(--gradient-mesh); }
+  .bg-gradient-aurora { background-image: var(--gradient-aurora); }
+  .shadow-card { box-shadow: var(--shadow-md); }
+  .shadow-card-hover { box-shadow: var(--shadow-lg); }
+  .shadow-hero { box-shadow: var(--shadow-xl); }
+  .shadow-neon { box-shadow: var(--shadow-neon-emerald); }
+  .shadow-neon-gold { box-shadow: var(--shadow-neon-gold); }
+  .shadow-neon-teal { box-shadow: var(--shadow-neon-teal); }
+  .glass { @apply bg-background border-b border-border/50; }
+  .glass-dark { @apply bg-foreground/95 border border-white/10; }
+
+  .course-scroll-stable {
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    isolation: isolate;
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    /* Prevent layout thrash / card overlap on mobile scroll */
+    .course-scroll-stable {
+      will-change: scroll-position;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .course-scroll-stable img {
+      /* Force the browser to resolve img dimensions before paint */
+      display: block;
+      max-width: 100%;
+    }
+
+    .course-scroll-stable a,
+    .course-scroll-stable button {
+      transform: none !important;
+      transition-property: color, background-color, border-color, box-shadow, opacity !important;
+    }
+  }
+
+  .neon-border {
+    position: relative;
+  }
+  .neon-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--gradient-neon);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  .animate-aurora {
+    animation: aurora-spin 18s linear infinite;
+  }
+  .animate-float {
+    animation: float-y 6s ease-in-out infinite;
+  }
+  .animate-pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+}
+
+@keyframes aurora-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px hsl(135 60% 30% / 0.45), 0 0 40px hsl(92 53% 51% / 0.25); }
+  50% { box-shadow: 0 0 35px hsl(127 56% 40% / 0.7), 0 0 70px hsl(92 53% 55% / 0.4); }
+}
+
+/* ───── Rich Editor / Blog content extras ───── */
+.rtl-block {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Amiri', 'Scheherazade New', 'Traditional Arabic', serif;
+  font-size: 1.35em;
+  line-height: 2.1;
+}
+.prose blockquote.callout,
+blockquote.callout {
+  border-left: 4px solid hsl(var(--primary));
+  background: hsl(var(--primary) / 0.08);
+  padding: 1rem 1.25rem;
+  border-radius: 0.5rem;
+  margin: 1.25rem 0;
+  font-style: normal;
+}
+.tiptap-table,
+.prose table.tiptap-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+.tiptap-table th, .tiptap-table td,
+.prose .tiptap-table th, .prose .tiptap-table td {
+  border: 1px solid hsl(var(--border));
+  padding: 0.5rem 0.75rem;
+  text-align: start;
+}
+.tiptap-table th { background: hsl(var(--muted)); font-weight: 600; }
+ul[data-type="taskList"] { list-style: none; padding-left: 0; }
+ul[data-type="taskList"] li { display: flex; gap: 0.5rem; align-items: flex-start; }
+ul[data-type="taskList"] li > label { margin-top: 0.25rem; }
+
+/* Hide scrollbar utility */
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }

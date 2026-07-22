@@ -1,0 +1,37 @@
+# Amar Talim
+
+> বাংলা ভাষায় আরবী ভাষা শিক্ষা, কুরআন-তাজবীদ, AI ও আধুনিক স্কিল বিষয়ক গভীর গবেষণাভিত্তিক ব্লগ ও ই-লার্নিং প্ল্যাটফর্ম।
+
+Amar Talim (আমার তা'লীম) is a Bengali-language educational publication focused on Arabic language learning, Quranic studies, tajweed, AI tools, and modern career skills. All content is original, expert-authored, and written for Bengali (Bangla) speakers.
+
+Primary topics: Arabic alphabet for Bengali speakers, tajweed rules, Quranic vocabulary, Arabic grammar (nahw & sarf), Arabic conversation, Quran study apps, AI tools, prompt engineering, digital marketing, freelancing.
+
+Language: Bengali (bn). Publisher: Amar Talim. Site: https://amaracademy.lovable.app
+
+## Blog
+
+- [আরবী বর্ণমালা পরিচিতি: বাংলাভাষীদের জন্য সম্পূর্ণ গাইড](https://amaracademy.lovable.app/blogs/arabic-alphabet-guide-for-bengali-speakers): ২৮টি আরবী অক্ষর, হরকত ও দৈনিক রুটিন — শূন্য থেকে কুরআন পড়া পর্যন্ত যাত্রা শুরু করুন এই ব্যবহারিক গাইডে।
+- [তাজবীদের প্রাথমিক নিয়ম: সঠিক উচ্চারণে কুরআন তিলাওয়াত](https://amaracademy.lovable.app/blogs/tajweed-rules-for-beginners): মাখরাজ, সিফাত, নুন সাকিন, মাদ্দ — তাজবীদের মূল নিয়মগুলো সহজ ভাষায় শিখুন এবং কুরআন পড়ুন নবীজির মতো।
+- [কুরআনের ২৫০টি সর্বাধিক ব্যবহৃত আরবী শব্দ](https://amaracademy.lovable.app/blogs/arabic-vocabulary-250-most-used-words): মাত্র ২৫০টি মূল শব্দ শিখলে কুরআনের ৮০% বুঝতে পারবেন। প্রমাণিত পদ্ধতি ও ৩০ দিনের চ্যালেঞ্জ।
+- [আরবী ব্যাকরণের মূল কাঠামো: নাহভ ও সরফ পরিচিতি](https://amaracademy.lovable.app/blogs/arabic-grammar-fundamentals-nahw-sarf): ইসম, ফি'ল, হারফ — আরবী ব্যাকরণের মৌলিক ভাগ। ১ বছরে কুরআনের আয়াত বিশ্লেষণ করার রোডম্যাপ।
+- [আরবী কথা বলা শুরু: ১০টি অপরিহার্য বাক্য ও কৌশল](https://amaracademy.lovable.app/blogs/arabic-conversation-10-essential-phrases): পড়তে পারা আর বলতে পারা ভিন্ন। ৬ মাসের রোডম্যাপ অনুসরণ করে আজই আরবী কথা বলা শুরু করুন।
+- [আরবী শেখার সেরা ৭টি মোবাইল অ্যাপ (২০২৬)](https://amaracademy.lovable.app/blogs/best-mobile-apps-to-learn-arabic): Quran.com থেকে Bayyinah TV — পকেটে নিয়ে চলুন বিশ্বের সেরা আরবী শিক্ষকদের। সম্পূর্ণ পর্যালোচনা।
+- [Gemini দিয়ে ছবি থেকে কমিক বুক বানানোর সহজ গাইড](https://amaracademy.lovable.app/blogs/gemini-image-to-comic-book-guide): নতুন বানানা মডেলের সাহায্যে প্রফেশনাল AI ডিজাইন এবং ক্যারেক্টার কনসেপ্ট তৈরির টেকনিক জানুন।
+- [Google NotebookLM-এর মাধ্যমে পড়াশোনা ও রিসার্চের গতি ১০ গুণ বাড়ান](https://amaracademy.lovable.app/blogs/google-notebooklm-study-research): Google NotebookLM ব্যবহার করে আপনার পড়াশোনা ও রিসার্চের গতি বাড়িয়ে দিন বহু গুণ।
+- [ফেসবুক অ্যাডভান্স সিক্রেট হ্যাকস: অ্যাড পারফরম্যান্স দ্বিগুণ করুন](https://amaracademy.lovable.app/blogs/facebook-advance-secret-hacks): ফেসবুকের অ্যালগরিদম কি আপনার কাস্টমারদের চিনে? জানুন উন্নত টার্গেটিং কৌশল।
+- [ভিডিও বানানো শেষ, এরপর? আমার সিক্রেট AI ওয়ার্কফ্লো](https://amaracademy.lovable.app/blogs/video-editing-seo-freelancing): ভিডিও এডিটিং, SEO, ফ্রিল্যান্সিং, ব্লগ — সব একসাথে কীভাবে সামলাবেন।
+- [৮টি AI টুল ও মার্কেটিং কৌশল যা সত্যিই কাজ করে](https://amaracademy.lovable.app/blogs/8-ai-tools-marketing-workflow): মার্কেটে এখন হাজারো AI টুল আছে, আপনি কোনগুলো ব্যবহার করবেন?
+- [Deepfake ও AI প্রতারণা থেকে নিজেকে বাঁচানোর ৫টি উপায়](https://amaracademy.lovable.app/blogs/deepfake-ai-protection): Deepfake এবং AI প্রতারণা থেকে নিজেকে ও পরিবারকে সুরক্ষিত রাখুন।
+
+## Pages
+
+- [হোমপেজ](https://amaracademy.lovable.app/): সাইটের ভূমিকা ও সর্বশেষ ব্লগ।
+- [সব ব্লগ](https://amaracademy.lovable.app/blogs): সম্পূর্ণ ব্লগ সংগ্রহ, ক্যাটাগরি ও সার্চ সহ।
+- [ডিজিটাল লাইব্রেরি](https://amaracademy.lovable.app/library): ই-বুক ও জীবনী।
+- [কোর্সসমূহ](https://amaracademy.lovable.app/courses): ই-লার্নিং কোর্স তালিকা।
+
+## Optional
+
+- [Full content (llms-full.txt)](https://amaracademy.lovable.app/llms-full.txt): সব আর্টিকেলের সম্পূর্ণ টেক্সট AI ingestion-এর জন্য।
+- [Sitemap](https://amaracademy.lovable.app/sitemap.xml): সম্পূর্ণ URL তালিকা।
+- [RSS Feed](https://amaracademy.lovable.app/rss.xml): সর্বশেষ ব্লগ সাবস্ক্রিপশন।
