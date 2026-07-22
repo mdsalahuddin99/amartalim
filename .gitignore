@@ -19,6 +19,11 @@ dist-ssr
 .DS_Store
 *.suo
 *.ntvs*
+
+# Build and Cache
+.next
+.turbo
+*.log
 *.njsproj
 *.sln
 *.sw?
