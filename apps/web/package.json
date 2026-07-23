@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "npx prisma generate && next build",
+    "postbuild": "node ../../scripts/copy-assets.mjs web",
     "start": "next start",
+    "start:standalone": "node .next/standalone/apps/web/server.js",
     "lint": "next lint",
     "seed": "npx tsx scripts/seed-blogs.ts"
   },
