@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST='{"components\\\\admin\\\\blogs\\\\BlogFormMain.tsx -> ../RichEditor":{"id":64928,"files":["static/chunks/9af238c7.f180fbb4199b9b17.js","static/chunks/22747d63.9abab7d7d0d2beaa.js","static/chunks/5947-6d09671b8188f77d.js","static/chunks/4727-27fc1c0ff249d46b.js","static/chunks/7673.e67cc3a1b541c264.js","static/chunks/4928.51e2b4b64bb179ba.js"]}}';
