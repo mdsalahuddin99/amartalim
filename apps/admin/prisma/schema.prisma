@@ -143,6 +143,7 @@ model Blog {
   coverImage  String?
   published   Boolean       @default(false)
   publishedAt DateTime?
+  status      String        @default("draft") // draft, pending, scheduled, published
   views       Int           @default(0)
   featured    Boolean       @default(false)
   showToc     Boolean       @default(true)
