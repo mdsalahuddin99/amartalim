@@ -3,7 +3,9 @@ import path from 'path';
 
 const dirs = [
   'apps/web/src/components/ui',
-  'apps/web/src/contexts'
+  'apps/web/src/contexts',
+  'apps/admin/src/components/ui',
+  'apps/admin/src/contexts'
 ];
 
 let count = 0;
