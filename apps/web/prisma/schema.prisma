@@ -11,9 +11,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")   // Neon pooled
-  directUrl = env("DIRECT_URL")     // Neon direct (migrations)
+  provider  = "mysql"
+  url       = env("DATABASE_URL")
 }
 
 // ─── Roles ─────────────────────────────────────────
