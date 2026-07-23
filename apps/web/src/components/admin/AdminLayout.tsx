@@ -1,3 +1,5 @@
+"use client";
+
 import { Link, useLocation } from "@/lib/navigation";
 import { motion } from "framer-motion";
 import {

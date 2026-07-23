@@ -89,7 +89,7 @@ const AdminCourses = () => {
     toast.success("কোর্স তৈরি হয়েছে");
   };
 
-  const openEditCourse = (course: Course) => {
+  const openEditCourse = (course: any) => {
     setEditingCourseId(course.id);
     setCourseForm({
       title: course.title, description: course.description, categoryId: course.categoryId,
@@ -131,7 +131,7 @@ const AdminCourses = () => {
     toast.success("পাঠ যোগ হয়েছে");
   };
 
-  const openEditLesson = (lesson: Lesson) => {
+  const openEditLesson = (lesson: any) => {
     setEditingLessonId(lesson.id);
     setLessonForm({ title: lesson.title || "", description: lesson.description || "", youtubeId: lesson.youtubeId || "", duration: lesson.duration ? String(lesson.duration) : "" });
     setEditLessonDialogOpen(true);

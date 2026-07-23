@@ -15,9 +15,13 @@ export async function createQuizQuestion(data: {
   });
 
   if (!quiz) {
+    const lesson = await prisma.lesson.findUnique({ where: { id: data.lessonId } });
+    if (!lesson) throw new Error("Lesson not found");
+    
     quiz = await prisma.quiz.create({
       data: {
         lessonId: data.lessonId,
+        courseId: lesson.courseId,
         title: "Quiz for lesson",
       }
     });

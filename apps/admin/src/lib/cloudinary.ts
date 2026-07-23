@@ -6,7 +6,7 @@
  *   cloudinary.config({ cloud_name, api_key, api_secret });
  */
 export const cloudinaryConfig = {
-  cloudName: import.meta.env?.VITE_CLOUDINARY_CLOUD_NAME ?? "",
+  cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME || "",
 };
 
 export const buildCloudinaryUrl = (

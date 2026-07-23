@@ -9,7 +9,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import type { Course, Lesson } from "@/types/course";
-import { mockUser } from "@/types/course";
 import { useSession } from "@/server/auth/session";
 
 /** Deterministic certificate ID from inputs — same user+lesson always gets same ID. */
@@ -26,8 +25,8 @@ const buildCertId = (userId: string, courseId: string, lessonId: string) => {
 const Certificate = ({ course, lesson }: { course: any; lesson: any }) => {
   const { courseId, lessonId } = useParams<{ courseId: string; lessonId: string }>();
   const { user } = useSession();
-  const studentName = user?.name || mockUser.name;
-  const studentId = user?.id || mockUser.id;
+  const studentName = user?.name || "শিক্ষার্থী";
+  const studentId = user?.id || "USER-0000";
   const [copied, setCopied] = useState(false);
 
   const today = useMemo(

@@ -6,14 +6,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Save, FileQuestion, Plus, CheckCircle2, Circle, X, Pencil } from "lucide-react";
 import { toast } from "sonner";
-import type { QuizMeta, QuizQuestion } from "@/types/course";
+import type { QuizQuestion } from "@/types/course";
+import type { QuizMeta } from "@/contexts/AdminContext";
 
 interface Props {
   initial?: QuizMeta;
   quizQuestions: QuizQuestion[];
   onSaveMeta: (v: Partial<QuizMeta>) => string;
-  onAddQuestion: (quizId: string, q: Omit<QuizQuestion, "id" | "lessonId">) => void;
-  onUpdateQuestion: (id: string, q: Partial<QuizQuestion>) => void;
+  onAddQuestion: (quizId: string, q: any) => void;
+  onUpdateQuestion: (id: string, q: any) => void;
   onDeleteQuestion: (id: string) => void;
   onClose: () => void;
 }
@@ -29,7 +30,7 @@ export const QuizForm = ({
   const [attempts, setAttempts] = useState<number | "">(initial?.attempts ?? 3);
   const [currentQuizId, setCurrentQuizId] = useState<string | undefined>(initial?.id);
 
-  const [qForm, setQForm] = useState<Omit<QuizQuestion, "id" | "lessonId">>(emptyQ);
+  const [qForm, setQForm] = useState<any>(emptyQ);
   const [editingQId, setEditingQId] = useState<string | null>(null);
 
   const saveMeta = (showToast = true) => {

@@ -189,7 +189,7 @@ const BlogDetail = ({
       <SharedNavbar showAuth />
 
       <div className="pt-8 pb-6 border-b border-foreground/10 bg-background">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <Link to="/blogs">
             <Button variant="outline" className="rounded-none mb-6 text-sm py-1.5 h-auto">
               <ArrowLeft className="w-4 h-4 mr-2" /> সব আর্টিকেলে ফিরে যান
@@ -236,11 +236,11 @@ const BlogDetail = ({
       </div>
 
       {/* Body */}
-          <div className="px-4 sm:px-10 md:px-16 pt-8 pb-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-12">
             <div className="grid lg:grid-cols-[minmax(0,1fr)_260px] gap-8 lg:gap-12">
 
           {/* Article */}
-          <article className="max-w-2xl mx-auto w-full">
+          <article className="max-w-none w-full">
             {post.cover && (
               <div className="mb-6 rounded-xl overflow-hidden aspect-[16/9] relative shadow-sm border border-foreground/5">
                 <SmartImage src={post.cover} alt={post.title} className="w-full h-full object-cover" />

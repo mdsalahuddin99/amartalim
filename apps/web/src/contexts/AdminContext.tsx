@@ -10,13 +10,13 @@ import {
 import { toast } from "sonner";
 
 // Types
-export interface Category { id: string; name: string; description?: string; parentId?: string | null; icon?: any; }
+export interface Category { id: string; name: string; slug: string; description?: string; parentId?: string | null; icon?: any; courseCount?: number; }
 export interface Course { id: string; title: string; published: boolean; [key: string]: any; }
 export interface Topic { id: string; courseId: string; title: string; summary?: string; order: number; }
 export interface Lesson { id: string; courseId: string; topicId?: string; title: string; order: number; [key: string]: any; }
 export interface QuizMeta { id: string; courseId: string; topicId?: string; title: string; order: number; [key: string]: any; }
 export interface Assignment { id: string; courseId: string; topicId: string; title: string; order: number; [key: string]: any; }
-export interface QuizQuestion { id: string; lessonId: string; question: string; [key: string]: any; }
+import type { QuizQuestion } from "@/types/course";
 
 interface AdminContextType {
   categories: Category[];
@@ -31,7 +31,7 @@ interface AdminContextType {
   updateCategory: (id: string, cat: Partial<Category>) => void;
   deleteCategory: (id: string) => void;
   // Courses
-  addCourse: (course: Omit<Course, "id">) => string;
+  addCourse: (course: Omit<Course, "id">) => Promise<string>;
   updateCourse: (id: string, course: Partial<Course>) => void;
   deleteCourse: (id: string) => void;
   // Topics
@@ -256,7 +256,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     setQuizzes((p) => [...p.filter((q) => q.courseId !== cid), ...snap.quizzes]);
     setAssignments((p) => [...p.filter((a) => a.courseId !== cid), ...snap.assignments]);
     const ownedIds = new Set([...snap.lessons.map((l) => l.id), ...snap.quizzes.map((q) => q.id)]);
-    setQuizQuestions((p) => [...p.filter((q) => !ownedIds.has(q.lessonId)), ...snap.quizQuestions]);
+    setQuizQuestions((p) => [...p.filter((q) => !ownedIds.has(q.quizId)), ...snap.quizQuestions]);
   };
 
   const ensureDefaultTopic = (courseId: string): string => {

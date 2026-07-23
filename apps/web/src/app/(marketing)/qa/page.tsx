@@ -32,7 +32,7 @@ export default async function QaHomepage() {
       {/* Hero Section */}
       <div className="bg-primary/5 border-b py-16 px-4">
         <div className="max-w-5xl mx-auto text-center space-y-4">
-          <Badge className="bg-primary/10 text-primary hover:bg-primary/20" variant="flat">আপনার জিজ্ঞাসা</Badge>
+          <Badge className="bg-primary/10 text-primary hover:bg-primary/20" variant="secondary">আপনার জিজ্ঞাসা</Badge>
           <h1 className="text-3xl sm:text-5xl font-bold font-serif-bn text-foreground">ইসলামিক প্রশ্নোত্তর ও ফতোয়া</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
             আপনার দৈনন্দিন জীবনের ইসলামিক সমস্যা ও জিজ্ঞাসাগুলোর নির্ভরযোগ্য শরয়ি সমাধান।

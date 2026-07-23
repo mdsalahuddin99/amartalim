@@ -16,7 +16,7 @@ export interface CategoryBlocksProps {
 /** Per-category section blocks (main + 2 list items each). */
 export const CategoryBlocks = ({ posts }: CategoryBlocksProps) => {
   const byCat = useMemo(() => {
-    const map: Record<string, Posts> = {};
+    const map: Record<string, Posts[]> = {};
     posts.forEach((p) => {
       map[p.categoryId] = map[p.categoryId] || [];
       map[p.categoryId].push(p);

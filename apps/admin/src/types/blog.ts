@@ -33,6 +33,7 @@ export interface ManagedBlogPost {
   cover: string;
   categoryId: string;
   categoryName: string;
+  author: string;
   authorProfileId?: string;
   authorProfileSlug?: string;
   authorBio?: string;

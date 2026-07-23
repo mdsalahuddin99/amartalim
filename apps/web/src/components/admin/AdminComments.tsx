@@ -129,7 +129,6 @@ const AdminComments = ({ initialComments }: { initialComments: any[] }) => {
         ) : (
           <ul className="divide-y divide-border/50">
             {filtered.map((c) => {
-              const post = postMap.get(c.blogId);
               return (
                 <li key={c.id} className="p-4 flex gap-3 hover:bg-muted/30 transition-colors">
                   <Avatar className="h-9 w-9 shrink-0">
@@ -155,14 +154,14 @@ const AdminComments = ({ initialComments }: { initialComments: any[] }) => {
                         {c.body}
                       </p>
                     )}
-                    {post && (
+                    {c.blogSlug && (
                       <Link
-                        to={`/blogs/${post.slug}#comments`}
+                        to={`/blogs/${c.blogSlug}#comments`}
                         target="_blank"
                         className="text-[11px] text-primary hover:underline mt-2 inline-flex items-center gap-1"
                       >
                         <ExternalLink className="h-3 w-3" />
-                        {post.title}
+                        {c.blogTitle}
                       </Link>
                     )}
                   </div>

@@ -36,7 +36,7 @@ const CommentItem = ({ node, blogId, depth }: NodeProps) => {
 
   const handleDelete = async () => {
     if (!confirm("এই মন্তব্য মুছে ফেলবেন?")) return;
-    const res = await deleteComment(user, node.id);
+    const res = await deleteComment(node.id);
     if ("error" in res) {
       toast({ title: "ত্রুটি", description: res.error, variant: "destructive" });
     }

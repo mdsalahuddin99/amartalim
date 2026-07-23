@@ -21,7 +21,7 @@ export default async function Page({ params }: { params: { courseId: string } })
     },
   });
 
-  const categories = await prisma.category.findMany();
+  const categories = await prisma.courseCategory.findMany();
 
   if (!course) {
     redirect("/admin/courses");

@@ -11,8 +11,9 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { formatBlogDate } from "@/lib/seed/blog-data";
-import { type ManagedBlogPost, type ManagedBlogCategory } from "@/types/blog";
-import { AdSlot } from "@/components/ads/AdSlot";
+import type { ManagedBlogPost, ManagedBlogCategory } from "@/types/blog";
+import dynamic from "next/dynamic";
+const AdSlot = dynamic(() => import("@/components/ads/AdSlot").then(m => m.AdSlot), { ssr: false });
 import { BlogListSkeleton } from "@/components/blog/BlogSkeletons";
 import { cn } from "@/lib/utils";
 
@@ -160,16 +161,16 @@ const Blogs = ({
           </div>
           <div className="ml-auto">
             <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
-              <SelectTrigger className="h-9 w-[160px] rounded-none border-foreground/30 text-xs uppercase tracking-wider">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="newest">নতুন থেকে পুরাতন</SelectItem>
-                <SelectItem value="oldest">পুরাতন থেকে নতুন</SelectItem>
-                <SelectItem value="shortest">ছোট পড়া আগে</SelectItem>
-                <SelectItem value="longest">বড় পড়া আগে</SelectItem>
-              </SelectContent>
-            </Select>
+            <SelectTrigger className="h-9 w-[160px] rounded-none border-foreground/30 text-xs uppercase tracking-wider">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">নতুন থেকে পুরাতন</SelectItem>
+              <SelectItem value="oldest">পুরাতন থেকে নতুন</SelectItem>
+              <SelectItem value="shortest">ছোট পড়া আগে</SelectItem>
+              <SelectItem value="longest">বড় পড়া আগে</SelectItem>
+            </SelectContent>
+          </Select>
           </div>
         </div>
       </section>
@@ -194,7 +195,7 @@ const Blogs = ({
                         <SmartImage src={lead.cover} alt={lead.title} loading="eager"
                           className="absolute inset-0 w-full h-full object-cover md:group-hover:scale-[1.03] md:transition-transform md:duration-700" />
                       </div>
-                      <h2 className="font-serif-bn font-black text-2xl sm:text-3xl md:text-4xl leading-[1.15] tracking-tight group-hover:text-primary transition-colors">
+                      <h2 className="font-serif-bn font-black text-xl sm:text-2xl md:text-3xl leading-[1.15] tracking-tight group-hover:text-primary transition-colors">
                         {lead.title}
                       </h2>
                       <p className="mt-4 text-base text-muted-foreground leading-relaxed line-clamp-3">

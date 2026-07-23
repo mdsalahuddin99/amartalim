@@ -44,12 +44,12 @@ const AdminCategories = () => {
     setOpen(true);
   };
 
-  const openEdit = (cat: Category) => {
+  const openEdit = (cat: any) => {
     setEditing(cat);
     setForm({
       name: cat.name,
-      description: cat.description,
-      icon: cat.icon,
+      description: cat.description || "",
+      icon: cat.icon || "",
       parentId: cat.parentId || "",
     });
     setOpen(true);
@@ -76,6 +76,7 @@ const AdminCategories = () => {
     if (editing && form.parentId === editing.id) return toast.error("নিজেকে parent বানানো যাবে না");
     const payload = {
       name: form.name,
+      slug: form.name.trim().toLowerCase().replace(/\\s+/g, '-'),
       description: form.description,
       icon: form.icon,
       parentId: form.parentId || null,

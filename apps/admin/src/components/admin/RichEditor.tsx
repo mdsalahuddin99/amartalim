@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { EditorContent } from "@tiptap/react";
 import { BubbleMenu, FloatingMenu } from "@tiptap/react/menus";

@@ -1,11 +1,11 @@
-import type { ManagedBlogPost as Posts } from "@/types/blog";
+import type { ManagedBlogPost } from "@/types/blog";
 
 /**
  * Pure JSON-LD builder for the marketing homepage. Framework-agnostic so it
  * can be called from a Next.js Server Component (or `generateMetadata`) after
  * migration without changes.
  */
-export const buildHomeJsonLd = (siteUrl: string, posts: Posts) => [
+export const buildHomeJsonLd = (siteUrl: string, posts: ManagedBlogPost[]) => [
   {
     "@context": "https://schema.org",
     "@type": "WebSite",

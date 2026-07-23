@@ -33,7 +33,7 @@ const buildInstructorIndex = (): Map<string, InstructorPublic> => {
     }
   }
   const out = new Map<string, InstructorPublic>();
-  for (const [slug, { name, bio, courses: list }] of index) {
+  index.forEach(({ name, bio, courses: list }, slug) => {
     const totalStudents = list.reduce((s, c) => s + c.studentsCount, 0);
     const averageRating =
       list.reduce((s, c) => s + c.rating, 0) / Math.max(list.length, 1);
@@ -46,7 +46,7 @@ const buildInstructorIndex = (): Map<string, InstructorPublic> => {
       totalStudents,
       averageRating: Number(averageRating.toFixed(2)),
     });
-  }
+  });
   return out;
 };
 

@@ -32,10 +32,9 @@ export async function getLeaderboard(limit?: number): Promise<{ ok: boolean; dat
 
       // Completed lessons
       user.progress.forEach((p) => {
-        // filter out "__enrolled__"
-        const completedArr = p.completedLessons as string[];
-        const real = Array.isArray(completedArr) ? completedArr.filter((id: string) => id !== "__enrolled__").length : 0;
-        completedLessons += real;
+        if (p.completed) {
+          completedLessons += 1;
+        }
       });
 
       // Enrollment points
@@ -47,8 +46,8 @@ export async function getLeaderboard(limit?: number): Promise<{ ok: boolean; dat
       // Quiz Attempts
       const bestByQuiz = new Map<string, number>();
       user.quizAttempts.forEach((a) => {
-        const key = a.lessonId;
-        const pct = a.total > 0 ? Math.round((a.score / a.total) * 100) : 0;
+        const key = a.quizId;
+        const pct = a.maxScore > 0 ? Math.round((a.score / a.maxScore) * 100) : 0;
         bestByQuiz.set(key, Math.max(bestByQuiz.get(key) ?? 0, pct));
       });
 

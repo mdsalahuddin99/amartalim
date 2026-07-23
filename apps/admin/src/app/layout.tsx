@@ -1,5 +1,6 @@
 import "@/index.css";
 import { Providers } from "@/components/Providers";
+import React, { Suspense } from "react";
 
 export const metadata = {
   title: "আমার তালিম — বাংলা ব্লগ ও জ্ঞানভাণ্ডার",
@@ -20,7 +21,9 @@ export default function RootLayout({
           forcedTheme="light"
           disableTransitionOnChange
         >
-          {children}
+          <React.Suspense fallback={null}>
+            {children}
+          </React.Suspense>
         </Providers>
       </body>
     </html>

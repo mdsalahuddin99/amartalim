@@ -5,7 +5,7 @@ import type { ManagedBlogPost as Posts } from "@/types/blog";
  * can be called from a Next.js Server Component (or `generateMetadata`) after
  * migration without changes.
  */
-export const buildHomeJsonLd = (siteUrl: string, posts: Posts) => [
+export const buildHomeJsonLd = (siteUrl: string, posts: Posts[]) => [
   {
     "@context": "https://schema.org",
     "@type": "WebSite",

@@ -32,7 +32,7 @@ export async function getAdminAllData() {
   const lessons = await prisma.lesson.findMany({ where: { courseId: { in: courseIds } } });
   const quizzes = await prisma.quiz.findMany({ where: { courseId: { in: courseIds } } });
   const assignments = await prisma.assignment.findMany({ where: { courseId: { in: courseIds } } });
-  const quizQuestions = await prisma.quizQuestion.findMany({ where: { lessonId: { in: quizzes.map(q => q.lessonId!).filter(Boolean) } } });
+  const quizQuestions = await prisma.quizQuestion.findMany({ where: { quizId: { in: quizzes.map(q => q.id) } } });
   const categories = await prisma.courseCategory.findMany();
   
   return { courses, topics, lessons, quizzes, assignments, quizQuestions, categories };

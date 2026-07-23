@@ -59,7 +59,7 @@ export default function PageClient({ initialApplications }: { initialApplication
     const result = await submitRoleApplication({
       ...values,
       expertise: expertiseArray,
-    });
+    } as any);
 
     setIsSubmitting(false);
     

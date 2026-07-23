@@ -10,7 +10,7 @@ export const statusMeta: Record<BlogStatus, { label: string; cls: string }> = {
 export const emptyDraft = (): Partial<ManagedBlogPost> => ({
   title: "", slug: "", excerpt: "", content: "", cover: "",
   categoryId: "arabic", categoryName: "আরবী ভাষা শিক্ষা",
-  author: "Amar Talim", authorBio: "", tags: [], status: "draft", featured: false,
+  authorBio: "", tags: [], status: "draft", featured: false,
   faq: [], showToc: true,
 });
 

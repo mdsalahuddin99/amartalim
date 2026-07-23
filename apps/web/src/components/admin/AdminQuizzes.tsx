@@ -15,10 +15,10 @@ import { useAdmin } from "@/contexts/AdminContext";
 import type { QuizQuestion } from "@/types/course";
 import { toast } from "sonner";
 
-const emptyForm = { lessonId: "", question: "", options: ["", "", "", ""], correctAnswer: 0 };
+const emptyForm = { quizId: "", question: "", options: ["", "", "", ""], correctAnswer: 0 };
 
 const AdminQuizzes = () => {
-  const { courses, lessons, quizQuestions, addQuizQuestion, updateQuizQuestion, deleteQuizQuestion } = useAdmin();
+  const { courses, quizzes, quizQuestions, addQuizQuestion, updateQuizQuestion, deleteQuizQuestion } = useAdmin();
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
@@ -28,8 +28,8 @@ const AdminQuizzes = () => {
   const filteredQuestions = filterCourse === "all"
     ? quizQuestions
     : quizQuestions.filter((q) => {
-        const lesson = lessons.find((l) => l.id === q.lessonId);
-        return lesson?.courseId === filterCourse;
+        const quiz = quizzes.find((l) => l.id === q.quizId);
+        return quiz?.courseId === filterCourse;
       });
 
   const setOption = (index: number, value: string) => {
@@ -39,7 +39,7 @@ const AdminQuizzes = () => {
   };
 
   const validate = () => {
-    if (!form.lessonId) { toast.error("একটি পাঠ নির্বাচন করুন"); return false; }
+    if (!form.quizId) { toast.error("একটি কুইজ নির্বাচন করুন"); return false; }
     if (!form.question.trim()) { toast.error("প্রশ্ন আবশ্যক"); return false; }
     if (form.options.some((o) => !o.trim())) { toast.error("সকল অপশন পূরণ করুন"); return false; }
     return true;
@@ -47,20 +47,20 @@ const AdminQuizzes = () => {
 
   const handleCreate = () => {
     if (!validate()) return;
-    addQuizQuestion({ lessonId: form.lessonId, question: form.question, options: form.options, correctAnswer: form.correctAnswer });
+    addQuizQuestion({ quizId: form.quizId, question: form.question, options: form.options, correctAnswer: form.correctAnswer });
     setCreateOpen(false);
     toast.success("প্রশ্ন তৈরি হয়েছে");
   };
 
-  const openEdit = (q: QuizQuestion) => {
+  const openEdit = (q: any) => {
     setEditingId(q.id);
-    setForm({ lessonId: q.lessonId, question: q.question, options: [...q.options], correctAnswer: q.correctAnswer });
+    setForm({ quizId: q.quizId, question: q.question, options: [...q.options], correctAnswer: q.correctAnswer });
     setEditOpen(true);
   };
 
   const handleUpdate = () => {
     if (!editingId || !validate()) return;
-    updateQuizQuestion(editingId, { lessonId: form.lessonId, question: form.question, options: form.options, correctAnswer: form.correctAnswer });
+    updateQuizQuestion(editingId, { quizId: form.quizId, question: form.question, options: form.options, correctAnswer: form.correctAnswer });
     setEditOpen(false);
     setEditingId(null);
     toast.success("প্রশ্ন আপডেট হয়েছে");
@@ -74,18 +74,18 @@ const AdminQuizzes = () => {
   const formFields = (
     <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto">
       <div className="space-y-2">
-        <Label>পাঠ</Label>
-        <Select value={form.lessonId} onValueChange={(v) => setForm({ ...form, lessonId: v })}>
-          <SelectTrigger className="rounded-xl"><SelectValue placeholder="একটি পাঠ নির্বাচন করুন" /></SelectTrigger>
+        <Label>কুইজ</Label>
+        <Select value={form.quizId} onValueChange={(v) => setForm({ ...form, quizId: v })}>
+          <SelectTrigger className="rounded-xl"><SelectValue placeholder="একটি কুইজ নির্বাচন করুন" /></SelectTrigger>
           <SelectContent>
             {courses.map((course) => {
-              const courseLessons = lessons.filter((l) => l.courseId === course.id);
-              if (courseLessons.length === 0) return null;
+              const courseQuizzes = quizzes.filter((q) => q.courseId === course.id);
+              if (courseQuizzes.length === 0) return null;
               return (
                 <div key={course.id}>
                   <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{course.title}</div>
-                  {courseLessons.map((lesson) => (
-                    <SelectItem key={lesson.id} value={lesson.id}>{lesson.title}</SelectItem>
+                  {courseQuizzes.map((quiz) => (
+                    <SelectItem key={quiz.id} value={quiz.id}>{quiz.title || "নামহীন কুইজ"}</SelectItem>
                   ))}
                 </div>
               );
@@ -160,14 +160,14 @@ const AdminQuizzes = () => {
         ) : (
           <div className="divide-y divide-border/50">
             {filteredQuestions.map((q) => {
-              const lesson = lessons.find((l) => l.id === q.lessonId);
-              const course = courses.find((c) => c.id === lesson?.courseId);
+              const quiz = quizzes.find((l) => l.id === q.quizId);
+              const course = courses.find((c) => c.id === quiz?.courseId);
               return (
                 <div key={q.id} className="px-4 sm:px-5 py-3 sm:py-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-xs sm:text-sm">{q.question}</div>
-                      <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">{course?.title} → {lesson?.title}</div>
+                      <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">{course?.title} → {quiz?.title || "নামহীন কুইজ"}</div>
                       <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2">
                         {q.options.map((opt, i) => (
                           <span key={i} className={`text-[10px] sm:text-xs px-2 py-0.5 sm:py-1 rounded-full ${
@@ -186,7 +186,7 @@ const AdminQuizzes = () => {
                         </AlertDialogTrigger>
                         <AlertDialogContent className="max-w-[95vw] sm:max-w-md">
                           <AlertDialogHeader>
-                            <AlertDialogTitle>এই প্রশ্নটি মুছে ফেলবেন?</AlertDialogTitle>
+                            <AlertDialogTitle>{quiz?.title || "নামহীন কুইজ"} • {course?.title} - এই প্রশ্নটি মুছে ফেলবেন?</AlertDialogTitle>
                             <AlertDialogDescription>এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।</AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter className="flex-col sm:flex-row gap-2">

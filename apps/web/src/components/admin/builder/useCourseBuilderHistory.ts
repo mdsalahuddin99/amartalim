@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAdmin } from "@/contexts/AdminContext";
 import type {
-  Course, Topic, Lesson, QuizMeta, Assignment, QuizQuestion,
-} from "@/types/course";
+  Course, Topic, Lesson, QuizMeta, Assignment
+} from "@/contexts/AdminContext";
+import type { QuizQuestion } from "@/types/course";
 
 export interface CourseSnapshot {
   course: Course;
@@ -46,7 +47,7 @@ export function useCourseBuilderHistory(courseId: string) {
           ...lessons.filter((l) => l.courseId === courseId).map((l) => l.id),
           ...quizzes.filter((q) => q.courseId === courseId).map((q) => q.id),
         ]);
-        return quizQuestions.filter((q) => ids.has(q.lessonId));
+        return quizQuestions.filter((q) => ids.has(q.quizId));
       })(),
     };
   }, [courses, topics, lessons, quizzes, assignments, quizQuestions, courseId]);

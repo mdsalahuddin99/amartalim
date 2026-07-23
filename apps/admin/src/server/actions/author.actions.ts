@@ -1,6 +1,6 @@
 "use server";
 
-import { authorApplicationSchema, reviewNoteSchema, authorAdminCreateSchema, authorAdminUpdateSchema } from "@/lib/validators/author";
+import { authorApplicationSchema, reviewNoteSchema, authorAdminCreateSchema, authorAdminUpdateSchema, type AuthorAdminCreateInput } from "@/lib/validators/author";
 import { prisma } from "@/server/db/prisma";
 import { auth } from "@/server/auth/auth";
 import type { Author } from "@prisma/client";
@@ -106,10 +106,20 @@ export async function createAuthorAdmin(input: unknown): Promise<ActionResult<Au
   }
 
   try {
-    const d = parsed.data;
+    const d = parsed.data as AuthorAdminCreateInput;
     const author = await prisma.author.create({
       data: {
-        ...d,
+        name: d.name,
+        slug: d.slug,
+        email: d.email,
+        phone: d.phone ?? null,
+        avatar: d.avatar ?? null,
+        bio: d.bio,
+        shortBio: d.shortBio ?? null,
+        expertise: d.expertise ?? [],
+        facebook: d.facebook ?? null,
+        twitter: d.twitter ?? null,
+        website: d.website ?? null,
         status: "APPROVED",
         reviewedBy: session.user.id,
       },

@@ -21,8 +21,8 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useAdmin } from "@/contexts/AdminContext";
-import type { Topic, QuizQuestion } from "@/types/course";
+import { useAdmin, type Topic } from "@/contexts/AdminContext";
+import type { QuizQuestion } from "@/types/course";
 import { toast } from "sonner";
 
 import { Item, ItemKind, itemId, parseItemId } from "./builder/types";
@@ -173,7 +173,7 @@ const CourseBuilder = ({ courseId, backHref = "/admin/courses" }: Props) => {
           <h2 className="text-sm font-semibold flex items-center gap-2">
             <Settings className="h-4 w-4 text-primary" /> কোর্স সেটিংস
           </h2>
-          <CourseSettingsPanel course={course} allCourses={courses} onChange={(patch) => updateCourse(course.id, patch)} />
+          <CourseSettingsPanel course={course as any} allCourses={courses as any} onChange={(patch) => updateCourse(course.id, patch as any)} />
         </div>
       </div>
 
@@ -197,7 +197,7 @@ const CourseBuilder = ({ courseId, backHref = "/admin/courses" }: Props) => {
           )}
           {drawer?.kind === "lesson" && (
             <LessonForm
-              initial={drawer.lessonId ? lessons.find((l) => l.id === drawer.lessonId) : undefined}
+              initial={drawer.lessonId ? (lessons.find((l) => l.id === drawer.lessonId) as any) : undefined}
               onSave={(values) => {
                 if (drawer.lessonId) {
                   updateLesson(drawer.lessonId, values);
@@ -219,8 +219,8 @@ const CourseBuilder = ({ courseId, backHref = "/admin/courses" }: Props) => {
           )}
           {drawer?.kind === "quiz" && (
             <QuizForm
-              initial={drawer.quizId ? quizzes.find((q) => q.id === drawer.quizId) : undefined}
-              quizQuestions={drawer.quizId ? quizQuestions.filter((q) => q.lessonId === drawer.quizId) : []}
+              initial={drawer.quizId ? (quizzes.find((q) => q.id === drawer.quizId) as any) : undefined}
+              quizQuestions={drawer.quizId ? quizQuestions.filter((q) => q.quizId === drawer.quizId) : []}
               onSaveMeta={(values) => {
                 if (drawer.quizId) {
                   updateQuiz(drawer.quizId, values);
@@ -236,7 +236,7 @@ const CourseBuilder = ({ courseId, backHref = "/admin/courses" }: Props) => {
                 setDrawer({ kind: "quiz", topicId: drawer.topicId, quizId: newId });
                 return newId;
               }}
-              onAddQuestion={(quizId, q) => addQuizQuestion({ ...q, lessonId: quizId } as Omit<QuizQuestion, "id">)}
+              onAddQuestion={(quizId, q) => addQuizQuestion({ ...q, quizId } as any)}
               onUpdateQuestion={(id, q) => updateQuizQuestion(id, q)}
               onDeleteQuestion={(id) => deleteQuizQuestion(id)}
               onClose={() => setDrawer(null)}
@@ -244,7 +244,7 @@ const CourseBuilder = ({ courseId, backHref = "/admin/courses" }: Props) => {
           )}
           {drawer?.kind === "assignment" && (
             <AssignmentForm
-              initial={drawer.assignmentId ? assignments.find((a) => a.id === drawer.assignmentId) : undefined}
+              initial={drawer.assignmentId ? (assignments.find((a) => a.id === drawer.assignmentId) as any) : undefined}
               onSave={(values) => {
                 if (drawer.assignmentId) {
                   updateAssignment(drawer.assignmentId, values);
@@ -414,7 +414,7 @@ const itemMeta = (item: Item, quizQuestions: QuizQuestion[]) => {
   }
   if (item.kind === "quiz") {
     const q = item.data;
-    const count = quizQuestions.filter((x) => x.lessonId === q.id).length;
+    const count = quizQuestions.filter((x) => x.quizId === q.id).length;
     return { Icon: FileQuestion, label: "কুইজ", meta: `${count} প্রশ্ন` };
   }
   const a = item.data;

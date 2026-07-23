@@ -1,7 +1,11 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { RichEditor } from "@/components/admin/RichEditor";
+import dynamic from "next/dynamic";
+const RichEditor = dynamic(() => import("@/components/admin/RichEditor").then(m => m.RichEditor), { 
+  ssr: false, 
+  loading: () => <div className="p-4 border rounded-xl text-center text-sm bg-muted/20">এডিটর লোড হচ্ছে...</div> 
+});
 import { slugify, type ManagedBlogPost } from "@/types/blog";
 import type { BlogFieldErrors } from "./useBlogDraft";
 import { cn } from "@/lib/utils";

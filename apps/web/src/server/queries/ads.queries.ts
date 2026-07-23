@@ -41,17 +41,3 @@ export const SLOT_META: Record<AdSlot, { label: string; desc: string }> = {
   "sidebar": { label: "সাইডবার", desc: "ডান পাশের কলামে" },
 };
 
-export const getAdsData = async (): Promise<{ items: AdItem[]; config: AdsConfig }> => {
-  try {
-    const setting = await prisma.siteSetting.findUnique({
-      where: { key: "ads-content" },
-    });
-    if (!setting || !setting.value) {
-      return { items: [], config: { adsenseEnabled: false } };
-    }
-    
-    return setting.value as unknown as { items: AdItem[]; config: AdsConfig };
-  } catch (error) {
-    return { items: [], config: { adsenseEnabled: false } };
-  }
-};

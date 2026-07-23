@@ -1,3 +1,4 @@
+import React, { Suspense } from "react";
 import SharedNavbar from "@/components/shared/navbar";
 import QaAskClient from "./QaAskClient";
 import { getQaCategories } from "@/server/actions/qa-category.actions";
@@ -21,7 +22,9 @@ export default async function QaAskPage() {
           </p>
         </div>
         <div className="bg-card rounded-2xl shadow-sm border p-6 sm:p-8">
-          <QaAskClient categories={categories} />
+          <Suspense fallback={<div>Loading...</div>}>
+            <QaAskClient categories={categories} />
+          </Suspense>
         </div>
       </div>
     </div>

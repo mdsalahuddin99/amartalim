@@ -113,9 +113,12 @@ export async function createAssignment(data: {
   courseId: string;
   topicId: string;
   title: string;
-  description: string;
-  totalMarks: number;
-  passMarks: number;
+  description?: string;
+  instructions?: string;
+  totalMarks?: number;
+  maxPoints?: number;
+  passMarks?: number;
+  dueDays?: number;
   order: number;
 }) {
   const assignment = await prisma.assignment.create({
@@ -123,9 +126,9 @@ export async function createAssignment(data: {
       courseId: data.courseId,
       topicId: data.topicId,
       title: data.title,
-      description: data.description,
-      totalMarks: data.totalMarks,
-      passMarks: data.passMarks,
+      description: data.instructions || data.description || "",
+      totalMarks: data.maxPoints || data.totalMarks || 100,
+      passMarks: data.passMarks || 33,
       order: data.order,
     },
   });
@@ -138,8 +141,8 @@ export async function updateAssignment(id: string, data: any) {
     where: { id },
     data: {
       title: data.title,
-      description: data.description,
-      totalMarks: data.totalMarks,
+      description: data.instructions || data.description,
+      totalMarks: data.maxPoints || data.totalMarks,
       passMarks: data.passMarks,
     },
   });
@@ -170,6 +173,7 @@ export async function createQuiz(data: {
       title: data.title,
       description: data.description,
       order: data.order,
+      courseId: data.courseId,
     },
   });
   revalidatePath(`/admin/course-builder/${data.courseId}`);

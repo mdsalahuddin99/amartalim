@@ -47,6 +47,7 @@ const UserBlogs = ({ initialPosts, initialCategories, authors }: { initialPosts:
   const counts = useMemo<Record<BlogTab, number>>(() => ({
     all: posts.length,
     draft: posts.filter((p) => p.status === "draft").length,
+    pending: posts.filter((p) => p.status === "pending").length,
     scheduled: posts.filter((p) => p.status === "scheduled").length,
     published: posts.filter((p) => p.status === "published").length,
   }), [posts]);

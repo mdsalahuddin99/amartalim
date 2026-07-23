@@ -1,4 +1,4 @@
-import type { Lesson, QuizMeta, Assignment } from "@/types/course";
+import type { Lesson, QuizMeta, Assignment } from "@/contexts/AdminContext";
 
 export type ItemKind = "lesson" | "quiz" | "assignment";
 export type Item =

@@ -9,7 +9,7 @@ import { SheetHeader, SheetTitle, SheetFooter, SheetClose } from "@/components/u
 import { Save, Video, FileText, Radio } from "lucide-react";
 import { Youtube } from "@/components/shared/BrandIcons";
 import { toast } from "sonner";
-import type { Lesson } from "@/types/course";
+import type { Lesson } from "@/contexts/AdminContext";
 
 export const LessonForm = ({
   initial, onSave,
@@ -27,7 +27,7 @@ export const LessonForm = ({
     if (!title.trim()) return toast.error("শিরোনাম আবশ্যক");
     if (contentType === "video" && !youtubeId.trim()) return toast.error("YouTube ID আবশ্যক");
     onSave({
-      title: title.trim(), description, contentType, youtubeId, duration, body,
+      title: title.trim(), description, contentType, youtubeId, duration: duration === "" ? undefined : Number(duration), body,
       isPreview, dripDays: dripDays === "" ? undefined : Number(dripDays),
     });
   };

@@ -35,11 +35,11 @@ export interface Course extends PrismaCourse {
   subscriptionInterval?: "monthly" | "yearly" | string;
 }
 
-export interface Topic extends PrismaTopic {
+export interface Topic extends Omit<PrismaTopic, 'summary'> {
   summary?: string | null;
 }
 
-export interface Assignment extends PrismaAssignment {
+export interface Assignment extends Omit<PrismaAssignment, 'instructions' | 'maxPoints' | 'dueDays' | 'order'> {
   instructions?: string | null;
   maxPoints?: number | null;
   dueDays?: number | null;
@@ -59,13 +59,16 @@ export interface Lesson extends PrismaLesson {
 export interface QuizMeta extends PrismaQuiz {
   passingScore?: number | null;
   attempts?: number | null;
-  order?: number;
 }
 
-export interface QuizQuestion extends PrismaQuizQuestion {
+export interface QuizQuestion extends Omit<PrismaQuizQuestion, 'type' | 'options' | 'answers' | 'points' | 'order' | 'explanation'> {
   options?: string[];
   correctAnswer?: number;
   type?: "mcq" | "true-false" | "short" | "fill" | string;
+  answers?: number[];
+  points?: number;
+  order?: number;
+  explanation?: string | null;
 }
 
 export interface Enrollment extends PrismaEnrollment {

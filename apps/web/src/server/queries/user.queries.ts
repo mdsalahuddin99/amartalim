@@ -46,7 +46,7 @@ export const getLeaderboard = async (limit: number = 100) => {
       image: true,
       progress: { where: { completed: true }, select: { lessonId: true } },
       enrollments: { select: { courseId: true } },
-      quizAttempts: { select: { lessonId: true, score: true, maxScore: true } }
+      quizAttempts: { select: { quizId: true, score: true, maxScore: true } }
     }
   });
 
@@ -66,7 +66,7 @@ export const getLeaderboard = async (limit: number = 100) => {
     const bestByQuiz = new Map<string, number>();
     user.quizAttempts.forEach(a => {
       const pct = a.maxScore > 0 ? Math.round((a.score / a.maxScore) * 100) : 0;
-      bestByQuiz.set(a.lessonId, Math.max(bestByQuiz.get(a.lessonId) ?? 0, pct));
+      bestByQuiz.set(a.quizId, Math.max(bestByQuiz.get(a.quizId) ?? 0, pct));
     });
     bestByQuiz.forEach(pct => {
       quizzes += 1;

@@ -15,19 +15,19 @@ import { Badge } from "@/components/ui/badge";
 import { useAdmin } from "@/contexts/AdminContext";
 import { toast } from "sonner";
 
-const emptyForm = { lessonId: "", question: "", options: ["", "", "", ""], correctAnswer: 0 };
+const emptyForm = { quizId: "", question: "", options: ["", "", "", ""], correctAnswer: 0 };
 
 interface QuizBuilderProps {
   allowedCourseIds: string[];
 }
 
 const QuizBuilder = ({ allowedCourseIds }: QuizBuilderProps) => {
-  const { courses, lessons, quizQuestions, addQuizQuestion, updateQuizQuestion, deleteQuizQuestion } = useAdmin();
+  const { courses, quizzes, quizQuestions, addQuizQuestion, updateQuizQuestion, deleteQuizQuestion } = useAdmin();
 
   const myCourses = courses.filter((c) => allowedCourseIds.includes(c.id));
-  const myLessons = lessons.filter((l) => allowedCourseIds.includes(l.courseId));
-  const myLessonIds = new Set(myLessons.map((l) => l.id));
-  const myQuestions = quizQuestions.filter((q) => myLessonIds.has(q.lessonId));
+  const myQuizzes = quizzes.filter((qz) => allowedCourseIds.includes(qz.courseId));
+  const myQuizIds = new Set(myQuizzes.map((qz) => qz.id));
+  const myQuestions = quizQuestions.filter((q) => myQuizIds.has(q.quizId));
 
   const [filterCourse, setFilterCourse] = useState<string>("all");
   const [open, setOpen] = useState(false);
@@ -37,8 +37,8 @@ const QuizBuilder = ({ allowedCourseIds }: QuizBuilderProps) => {
   const filtered = filterCourse === "all"
     ? myQuestions
     : myQuestions.filter((q) => {
-        const l = lessons.find((x) => x.id === q.lessonId);
-        return l?.courseId === filterCourse;
+        const qz = quizzes.find((x) => x.id === q.quizId);
+        return qz?.courseId === filterCourse;
       });
 
   const setOption = (i: number, v: string) => {
@@ -48,7 +48,7 @@ const QuizBuilder = ({ allowedCourseIds }: QuizBuilderProps) => {
   };
 
   const validate = () => {
-    if (!form.lessonId) return toast.error("পাঠ নির্বাচন করুন"), false;
+    if (!form.quizId) return toast.error("কুইজ নির্বাচন করুন"), false;
     if (!form.question.trim()) return toast.error("প্রশ্ন আবশ্যক"), false;
     if (form.options.some((o) => !o.trim())) return toast.error("সকল অপশন পূরণ করুন"), false;
     return true;
@@ -56,7 +56,7 @@ const QuizBuilder = ({ allowedCourseIds }: QuizBuilderProps) => {
 
   const openCreate = () => {
     setEditingId(null);
-    setForm({ ...emptyForm, lessonId: myLessons[0]?.id ?? "" });
+    setForm({ ...emptyForm, quizId: myQuizzes[0]?.id ?? "" });
     setOpen(true);
   };
 
@@ -64,7 +64,7 @@ const QuizBuilder = ({ allowedCourseIds }: QuizBuilderProps) => {
     const q = quizQuestions.find((x) => x.id === id);
     if (!q) return;
     setEditingId(id);
-    setForm({ lessonId: q.lessonId, question: q.question, options: [...q.options], correctAnswer: q.correctAnswer });
+    setForm({ quizId: q.quizId, question: q.question, options: [...q.options], correctAnswer: q.correctAnswer });
     setOpen(true);
   };
 
@@ -86,10 +86,10 @@ const QuizBuilder = ({ allowedCourseIds }: QuizBuilderProps) => {
     toast.success("প্রশ্ন মুছে ফেলা হয়েছে");
   };
 
-  const lessonLabel = (lessonId: string) => {
-    const l = lessons.find((x) => x.id === lessonId);
-    const c = l ? courses.find((x) => x.id === l.courseId) : undefined;
-    return { lesson: l?.title ?? "—", course: c?.title ?? "—" };
+  const quizLabel = (quizId: string) => {
+    const qz = quizzes.find((x) => x.id === quizId);
+    const c = qz ? courses.find((x) => x.id === qz.courseId) : undefined;
+    return { quiz: qz?.title ?? "—", course: c?.title ?? "—" };
   };
 
   return (
@@ -99,7 +99,7 @@ const QuizBuilder = ({ allowedCourseIds }: QuizBuilderProps) => {
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">কুইজ ব্যবস্থাপনা</h1>
           <p className="text-muted-foreground text-sm mt-1">আপনার পাঠগুলোর জন্য MCQ প্রশ্ন তৈরি ও পরিচালনা করুন</p>
         </div>
-        <Button size="sm" className="rounded-xl bg-gradient-hero hover:opacity-90 shrink-0" onClick={openCreate} disabled={myLessons.length === 0}>
+        <Button size="sm" className="rounded-xl bg-gradient-hero hover:opacity-90 shrink-0" onClick={openCreate} disabled={myQuizzes.length === 0}>
           <Plus className="mr-1.5 h-4 w-4" /> নতুন প্রশ্ন
         </Button>
       </div>
@@ -107,9 +107,9 @@ const QuizBuilder = ({ allowedCourseIds }: QuizBuilderProps) => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: "মোট প্রশ্ন", value: myQuestions.length },
-          { label: "পাঠসমূহ", value: myLessons.length },
+          { label: "কুইজসমূহ", value: myQuizzes.length },
           { label: "কোর্স", value: myCourses.length },
-          { label: "গড় প্রশ্ন/পাঠ", value: myLessons.length ? (myQuestions.length / myLessons.length).toFixed(1) : "0" },
+          { label: "গড় প্রশ্ন/কুইজ", value: myQuizzes.length ? (myQuestions.length / myQuizzes.length).toFixed(1) : "0" },
         ].map((s) => (
           <div key={s.label} className="p-3 sm:p-4 rounded-2xl bg-card border border-border/50 shadow-card">
             <FileQuestion className="h-4 w-4 text-primary mb-1.5" />
@@ -134,12 +134,12 @@ const QuizBuilder = ({ allowedCourseIds }: QuizBuilderProps) => {
 
       {filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-          {myLessons.length === 0 ? "প্রশ্ন যোগ করতে আগে পাঠ তৈরি করুন" : "কোনো প্রশ্ন পাওয়া যায়নি"}
+          {myQuizzes.length === 0 ? "প্রশ্ন যোগ করতে আগে কুইজ তৈরি করুন" : "কোনো প্রশ্ন পাওয়া যায়নি"}
         </div>
       ) : (
         <div className="space-y-3">
           {filtered.map((q, idx) => {
-            const { lesson, course } = lessonLabel(q.lessonId);
+            const { quiz, course } = quizLabel(q.quizId);
             return (
               <div key={q.id} className="rounded-2xl bg-card border border-border/50 shadow-card p-4 sm:p-5">
                 <div className="flex items-start justify-between gap-3 mb-3">
@@ -147,7 +147,7 @@ const QuizBuilder = ({ allowedCourseIds }: QuizBuilderProps) => {
                     <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                       <Badge variant="secondary" className="text-[10px]">প্রশ্ন #{idx + 1}</Badge>
                       <Badge variant="outline" className="text-[10px]">{course}</Badge>
-                      <span className="text-[10px] text-muted-foreground truncate">{lesson}</span>
+                      <span className="text-[10px] text-muted-foreground truncate">{quiz}</span>
                     </div>
                     <p className="text-sm font-medium">{q.question}</p>
                   </div>
@@ -198,15 +198,15 @@ const QuizBuilder = ({ allowedCourseIds }: QuizBuilderProps) => {
           </DialogHeader>
           <div className="space-y-4 py-2 max-h-[60vh] overflow-y-auto">
             <div className="space-y-2">
-              <Label>পাঠ</Label>
-              <Select value={form.lessonId} onValueChange={(v) => setForm({ ...form, lessonId: v })}>
-                <SelectTrigger className="rounded-xl"><SelectValue placeholder="পাঠ নির্বাচন করুন" /></SelectTrigger>
+              <Label>কুইজ</Label>
+              <Select value={form.quizId} onValueChange={(v) => setForm({ ...form, quizId: v })}>
+                <SelectTrigger className="rounded-xl"><SelectValue placeholder="কুইজ নির্বাচন করুন" /></SelectTrigger>
                 <SelectContent>
-                  {myLessons.map((l) => {
-                    const c = courses.find((x) => x.id === l.courseId);
+                  {myQuizzes.map((qz) => {
+                    const c = courses.find((x) => x.id === qz.courseId);
                     return (
-                      <SelectItem key={l.id} value={l.id}>
-                        {c?.title} — {l.title}
+                      <SelectItem key={qz.id} value={qz.id}>
+                        {c?.title} — {qz.title}
                       </SelectItem>
                     );
                   })}

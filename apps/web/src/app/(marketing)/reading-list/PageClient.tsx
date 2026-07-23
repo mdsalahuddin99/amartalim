@@ -5,7 +5,7 @@ import { Link } from "@/lib/navigation";
 import { BookmarkX, BookOpen } from "lucide-react";
 import SharedNavbar from "@/components/shared/navbar";
 import { type ManagedBlogPost } from "@/types/blog";
-import { useReadingListStore } from "@/lib/stores/reading-list-store";
+
 import { useUserBookmarks, bookmarkStore } from "@/lib/stores/bookmarks-store";
 import { formatBlogDate } from "@/lib/seed/blog-data";
 import { toast } from "@/hooks/use-toast";

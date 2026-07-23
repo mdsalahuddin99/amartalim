@@ -1,5 +1,8 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { type AdSlot as AdSlotName, type AdItem, type AdsConfig, getAdsData } from "@/server/queries/ads.queries";
+import type { AdSlot as AdSlotName, AdItem, AdsConfig } from "@/server/queries/ads.queries";
+import { getAdsData } from "@/server/actions/ads.actions";
 import { sanitizeAdSnippet } from "@/lib/sanitize";
 
 import SmartImage from "@/components/shared/SmartImage";

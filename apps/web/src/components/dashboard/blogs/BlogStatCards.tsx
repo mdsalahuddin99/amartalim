@@ -10,8 +10,8 @@ interface Props {
 }
 
 export const BlogStatCards = ({ counts, tab, onTab }: Props) => (
-  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-    {(["all", "draft", "scheduled", "published"] as const).map((k) => (
+  <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+    {(["all", "draft", "pending", "scheduled", "published"] as const).map((k) => (
       <button
         key={k}
         onClick={() => onTab(k)}

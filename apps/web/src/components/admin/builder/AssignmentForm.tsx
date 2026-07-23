@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { SheetHeader, SheetTitle, SheetFooter, SheetClose } from "@/components/ui/sheet";
 import { Save, ClipboardList } from "lucide-react";
 import { toast } from "sonner";
-import type { Assignment } from "@/types/course";
+import type { Assignment } from "@/contexts/AdminContext";
 
 export const AssignmentForm = ({
   initial, onSave,

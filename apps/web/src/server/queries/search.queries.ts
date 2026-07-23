@@ -1,3 +1,5 @@
+"use server";
+
 import { prisma } from "@/server/db/prisma";
 import type { ManagedBlogPost } from "@/types/blog";
 import { getPublishedBlogs, getBlogsByTag } from "./blog.queries";

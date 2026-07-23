@@ -21,3 +21,18 @@ export async function updateAdsData(data: any) {
     return { ok: false, error: "Failed to update ads content" };
   }
 }
+
+export const getAdsData = async (): Promise<{ items: any[]; config: any }> => {
+  try {
+    const setting = await prisma.siteSetting.findUnique({
+      where: { key: "ads-content" },
+    });
+    if (!setting || !setting.value) {
+      return { items: [], config: { adsenseEnabled: false } };
+    }
+    
+    return setting.value as unknown as { items: any[]; config: any };
+  } catch (error) {
+    return { items: [], config: { adsenseEnabled: false } };
+  }
+};

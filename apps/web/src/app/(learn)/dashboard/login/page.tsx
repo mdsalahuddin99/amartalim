@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Metadata } from "next";
 import DashboardLoginPage from "./PageClient";
 
@@ -6,5 +7,9 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <DashboardLoginPage />;
+  return (
+    <React.Suspense fallback={<div />}>
+      <DashboardLoginPage />
+    </React.Suspense>
+  );
 }

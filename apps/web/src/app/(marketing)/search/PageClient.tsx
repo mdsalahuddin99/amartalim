@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Link, useSearchParams } from "@/lib/navigation";
 import { Search as SearchIcon } from "lucide-react";
 import PageShell from "@/components/shared/page-shell";
@@ -14,8 +14,29 @@ const SearchPage = () => {
   const [params, setParams] = useSearchParams();
   const initialQuery = params.get("q") ?? "";
   const [draft, setDraft] = useState(initialQuery);
+  const [results, setResults] = useState<{ query: string; courses: any[]; posts: any[]; total: number } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const results = useMemo(() => searchAll(initialQuery), [initialQuery]);
+  useEffect(() => {
+    if (!initialQuery) {
+      setResults(null);
+      return;
+    }
+    let active = true;
+    setIsLoading(true);
+    searchAll(initialQuery).then((res) => {
+      if (active) {
+        setResults(res);
+        setIsLoading(false);
+      }
+    }).catch(() => {
+      if (active) {
+        setResults({ query: initialQuery, courses: [], posts: [], total: 0 });
+        setIsLoading(false);
+      }
+    });
+    return () => { active = false; };
+  }, [initialQuery]);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +68,8 @@ const SearchPage = () => {
 
       {!initialQuery ? (
         <p className="text-muted-foreground">কিছু লিখে সার্চ করুন।</p>
+      ) : isLoading || !results ? (
+        <p className="text-muted-foreground">অনুসন্ধান চলছে...</p>
       ) : results.total === 0 ? (
         <Card className="p-8 text-center">
           <p className="font-medium">"{initialQuery}" এর জন্য কোনো ফলাফল পাওয়া যায়নি।</p>

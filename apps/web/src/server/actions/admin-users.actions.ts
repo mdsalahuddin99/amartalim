@@ -119,7 +119,7 @@ export async function deleteUser(userId: string) {
   revalidatePath("/admin/instructors");
 }
 
-export async function updateInstructorProfile(id: string, data: { name?: string; phone?: string; bio?: string; specialization?: string }) {
+export async function updateInstructorProfile(id: string, data: { name?: string; bio?: string; specialization?: string }) {
   await isAdmin();
   
   try {
@@ -127,7 +127,6 @@ export async function updateInstructorProfile(id: string, data: { name?: string;
       where: { id },
       data: {
         name: data.name,
-        phone: data.phone,
         bio: data.bio,
         specialization: data.specialization
       }

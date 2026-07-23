@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { SheetHeader, SheetTitle, SheetFooter, SheetClose } from "@/components/ui/sheet";
 import { Save } from "lucide-react";
 import { toast } from "sonner";
-import type { Topic } from "@/types/course";
+import type { Topic } from "@/contexts/AdminContext";
 
 export const TopicForm = ({
   initial, onSave,

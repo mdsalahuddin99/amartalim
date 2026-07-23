@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, Megaphone, Power, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,8 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { getAdsData, SLOT_META, type AdItem, type AdSlot, type AdKind, type AdsConfig } from "@/server/queries/ads.queries";
-import { updateAdsData } from "@/server/actions/ads.actions";
+import { SLOT_META, type AdItem, type AdSlot, type AdKind, type AdsConfig } from "@/server/queries/ads.queries";
+import { updateAdsData, getAdsData } from "@/server/actions/ads.actions";
 import { toast } from "sonner";
 
 import SmartImage from "@/components/shared/SmartImage";

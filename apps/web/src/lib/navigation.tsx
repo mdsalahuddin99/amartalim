@@ -51,10 +51,14 @@ export function useNavigate() {
 
 export function useLocation() {
   const pathname = usePathname();
-  const searchParams = useNextSearchParams();
   return {
     pathname,
-    search: searchParams ? `?${searchParams.toString()}` : "",
+    get search() {
+      if (typeof window !== "undefined") {
+        return window.location.search;
+      }
+      return "";
+    },
     hash: "", // Not natively provided as easily, but can be shimmed if really needed
     state: null,
   };

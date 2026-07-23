@@ -26,7 +26,7 @@ export default async function Page() {
   ]);
 
   return (
-    <Suspense>
+    <Suspense fallback={<div />}>
       <PageClient initialBlogs={initialBlogs} initialCategories={initialCategories} />
     </Suspense>
   );

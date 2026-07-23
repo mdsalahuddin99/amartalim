@@ -53,7 +53,7 @@ export default async function Page() {
   const categories = dbCategories.map(c => ({
     id: c.id,
     name: c.name,
-    icon: c.icon || "📁",
+    icon: (c as any).icon || "📁",
     courseCount: 0
   }));
 
