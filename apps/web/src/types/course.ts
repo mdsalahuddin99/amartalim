@@ -1,6 +1,6 @@
 import type { Course as PrismaCourse, Lesson as PrismaLesson, Enrollment as PrismaEnrollment, Quiz as PrismaQuiz, Topic as PrismaTopic, CourseCategory as PrismaCategory, Assignment as PrismaAssignment, QuizQuestion as PrismaQuizQuestion } from "@prisma/client";
 
-export interface Category extends PrismaCategory {
+export interface Category extends Omit<PrismaCategory, 'description'> {
   description?: string | null;
   courseCount?: number;
   icon?: string;

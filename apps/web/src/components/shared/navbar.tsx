@@ -25,6 +25,7 @@ import { useSession, sessionStore } from "@/server/auth/session";
 
 import SmartImage from "@/components/shared/SmartImage";
 import { getBlogCategories } from "@/server/actions/blog-category.actions";
+import { getHeaderFooterSettings } from "@/server/actions/site-settings.actions";
 import { type BlogCategory } from "@prisma/client";
 interface SharedNavbarProps {
   backTo?: string;
@@ -42,10 +43,14 @@ const SharedNavbar = ({ backTo, backLabel, rightContent, showAuth }: SharedNavba
   const { user, isAuthenticated } = useSession();
 
   const [realCats, setRealCats] = useState<BlogCategory[]>([]);
+  const [headerLinks, setHeaderLinks] = useState<{ id: string; label: string; url: string; type: string }[]>([]);
 
   useEffect(() => {
     getBlogCategories().then(res => {
       if (res.ok && res.data) setRealCats(res.data);
+    });
+    getHeaderFooterSettings().then(res => {
+      if (res && res.headerLinks) setHeaderLinks(res.headerLinks);
     });
   }, []);
 
@@ -94,69 +99,98 @@ const SharedNavbar = ({ backTo, backLabel, rightContent, showAuth }: SharedNavba
 
             {/* Center: Categories */}
             <div className="hidden lg:flex items-center gap-6">
-              <Link
-                to="/"
-                className={`text-sm font-semibold transition-colors border-b-2 pb-1 ${
-                  isActive("/") && location.pathname === "/"
-                    ? "text-primary border-[hsl(var(--accent))]"
-                    : "text-foreground/70 border-transparent hover:text-primary hover:border-[hsl(var(--accent))]"
-                }`}
-              >
-                হোম
-              </Link>
-              <Link
-                to="/qa"
-                className={`text-sm font-semibold transition-colors border-b-2 pb-1 ${
-                  isActive("/qa")
-                    ? "text-primary border-[hsl(var(--accent))]"
-                    : "text-foreground/70 border-transparent hover:text-primary hover:border-[hsl(var(--accent))]"
-                }`}
-              >
-                আপনার জিজ্ঞাসা
-              </Link>
-
-              {mainCats.map((c) => {
-                const subCats = getSubCats(c.id);
-                if (subCats.length > 0) {
-                  return (
-                    <div key={c.id} className="relative group">
-                      <Link
-                        to={`/blogs?cat=${c.id}`}
-                        className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors inline-flex items-center gap-1"
-                      >
-                        {c.name} <ChevronDown className="h-3.5 w-3.5" />
-                      </Link>
-                      <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all min-w-[200px] z-50">
-                        <div className="bg-background border border-foreground/10 rounded-xl shadow-lg overflow-hidden py-2">
-                          <Link to={`/blogs?cat=${c.id}`} className="block px-4 py-2 text-sm hover:bg-primary/5 hover:text-primary transition-colors font-semibold">
-                            {c.name} (সব)
+              {headerLinks.length > 0 ? (
+                (() => {
+                  const nestedLinks = [];
+                  headerLinks.forEach((link: any) => {
+                    if (link.isSubmenu && nestedLinks.length > 0) {
+                      const parent: any = nestedLinks[nestedLinks.length - 1];
+                      if (!parent.children) parent.children = [];
+                      parent.children.push(link);
+                    } else {
+                      nestedLinks.push({ ...link, children: [] });
+                    }
+                  });
+                  
+                  return nestedLinks.map((link: any) => {
+                    if (link.children && link.children.length > 0) {
+                      return (
+                        <div key={link.id} className="relative group">
+                          <Link
+                            to={link.url}
+                            className={`text-sm font-semibold transition-colors border-b-2 pb-1 inline-flex items-center gap-1 ${
+                              isActive(link.url) && (link.url === "/" ? location.pathname === "/" : true)
+                                ? "text-primary border-[hsl(var(--accent))]"
+                                : "text-foreground/70 border-transparent hover:text-primary hover:border-[hsl(var(--accent))]"
+                            }`}
+                          >
+                            {link.label} <ChevronDown className="h-3.5 w-3.5" />
                           </Link>
-                          <div className="h-px bg-foreground/10 my-1" />
-                          {subCats.map((sub) => (
-                            <Link
-                              key={sub.id}
-                              to={`/blogs?cat=${sub.id}`}
-                              className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-primary/5 hover:text-primary transition-colors"
-                            >
-                              <span>{sub.name}</span>
-                            </Link>
-                          ))}
+                          <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all min-w-[200px] z-50">
+                            <div className="bg-background border border-foreground/10 rounded-xl shadow-lg overflow-hidden py-2">
+                              {link.children.map((child: any) => (
+                                <Link
+                                  key={child.id}
+                                  to={child.url}
+                                  className="block px-4 py-2 text-sm hover:bg-primary/5 hover:text-primary transition-colors font-medium"
+                                >
+                                  {child.label}
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  );
-                }
-                
-                return (
+                      );
+                    }
+                    return (
+                      <Link
+                        key={link.id}
+                        to={link.url}
+                        className={`text-sm font-semibold transition-colors border-b-2 pb-1 ${
+                          isActive(link.url) && (link.url === "/" ? location.pathname === "/" : true)
+                            ? "text-primary border-[hsl(var(--accent))]"
+                            : "text-foreground/70 border-transparent hover:text-primary hover:border-[hsl(var(--accent))]"
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    );
+                  });
+                })()
+              ) : (
+                <>
                   <Link
-                    key={c.id}
-                    to={`/blogs?cat=${c.id}`}
-                    className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors"
+                    to="/"
+                    className={`text-sm font-semibold transition-colors border-b-2 pb-1 ${
+                      isActive("/") && location.pathname === "/"
+                        ? "text-primary border-[hsl(var(--accent))]"
+                        : "text-foreground/70 border-transparent hover:text-primary hover:border-[hsl(var(--accent))]"
+                    }`}
                   >
-                    {c.name}
+                    হোম
                   </Link>
-                );
-              })}
+                  <Link
+                    to="/qa"
+                    className={`text-sm font-semibold transition-colors border-b-2 pb-1 ${
+                      isActive("/qa")
+                        ? "text-primary border-[hsl(var(--accent))]"
+                        : "text-foreground/70 border-transparent hover:text-primary hover:border-[hsl(var(--accent))]"
+                    }`}
+                  >
+                    আপনার জিজ্ঞাসা
+                  </Link>
+                  <Link
+                    to="/library"
+                    className={`text-sm font-semibold transition-colors border-b-2 pb-1 ${
+                      isActive("/library")
+                        ? "text-primary border-[hsl(var(--accent))]"
+                        : "text-foreground/70 border-transparent hover:text-primary hover:border-[hsl(var(--accent))]"
+                    }`}
+                  >
+                    লাইব্রেরি
+                  </Link>
+                </>
+              )}
               {/* <div className="relative group">
                 <Link
                   to="/courses"
@@ -187,16 +221,7 @@ const SharedNavbar = ({ backTo, backLabel, rightContent, showAuth }: SharedNavba
                   </div>
                 </div>
               </div> */}
-              <Link
-                to="/library"
-                className={`text-sm font-semibold transition-colors border-b-2 pb-1 ${
-                  isActive("/library")
-                    ? "text-primary border-[hsl(var(--accent))]"
-                    : "text-foreground/70 border-transparent hover:text-primary hover:border-[hsl(var(--accent))]"
-                }`}
-              >
-                লাইব্রেরি
-              </Link>
+
             </div>
 
             {/* Right: Search + Auth + Mobile */}
@@ -280,130 +305,109 @@ const SharedNavbar = ({ backTo, backLabel, rightContent, showAuth }: SharedNavba
 
                   <div className="flex-1 overflow-y-auto px-3 py-4">
                     <Accordion type="multiple" className="w-full">
-                      {/* HOME */}
-                      <SheetClose asChild>
-                        <Link
-                          to="/"
-                          className={`flex items-center gap-3 px-3 py-3 rounded-xl font-serif-bn font-bold text-base transition-all ${
-                            location.pathname === "/"
-                              ? "bg-primary/10 text-primary"
-                              : "text-foreground/80 hover:bg-foreground/5"
-                          }`}
-                        >
-                          <Home className="h-5 w-5 shrink-0" />
-                          <span>হোম</span>
-                        </Link>
-                      </SheetClose>
+                      {headerLinks.length > 0 ? (
+                        (() => {
+                          const nestedLinks = [];
+                          headerLinks.forEach((link: any) => {
+                            if (link.isSubmenu && nestedLinks.length > 0) {
+                              const parent: any = nestedLinks[nestedLinks.length - 1];
+                              if (!parent.children) parent.children = [];
+                              parent.children.push(link);
+                            } else {
+                              nestedLinks.push({ ...link, children: [] });
+                            }
+                          });
 
-                      {/* QA */}
-                      <SheetClose asChild>
-                        <Link
-                          to="/qa"
-                          className={`flex items-center gap-3 px-3 py-3 rounded-xl font-serif-bn font-bold text-base transition-all ${
-                            isActive("/qa")
-                              ? "bg-primary/10 text-primary"
-                              : "text-foreground/80 hover:bg-foreground/5"
-                          }`}
-                        >
-                          <HelpCircle className="h-5 w-5 shrink-0" />
-                          <span>আপনার জিজ্ঞাসা</span>
-                        </Link>
-                      </SheetClose>
-
-                      {/* BLOGS ACCORDION */}
-                      <AccordionItem value="blogs" className="border-b-0">
-                        <AccordionTrigger className={`flex items-center gap-3 px-3 py-3 rounded-xl font-serif-bn font-bold text-base transition-all hover:no-underline hover:bg-foreground/5 ${isActive("/blogs") ? "text-primary" : "text-foreground/80"}`}>
-                          <div className="flex items-center gap-3">
-                            <BookOpen className="h-5 w-5 shrink-0" />
-                            <span>ব্লগ</span>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="pb-1 pl-11 pr-3">
-                          <div className="flex flex-col space-y-1">
-
-                            {mainCats.map((c) => {
-                              const subCats = getSubCats(c.id);
+                          return nestedLinks.map((link: any) => {
+                            if (link.children && link.children.length > 0) {
                               return (
-                                <div key={c.id} className="flex flex-col">
-                                  <SheetClose asChild>
-                                    <Link
-                                      to={`/blogs?cat=${c.id}`}
-                                      className="block px-3 py-2 rounded-lg text-sm text-foreground/80 hover:bg-foreground/5 hover:text-primary transition-colors font-medium"
-                                    >
-                                      {c.name}
-                                    </Link>
-                                  </SheetClose>
-                                  {subCats.length > 0 && (
-                                    <div className="pl-4 flex flex-col mt-0.5 border-l-2 border-border/50 ml-4">
-                                      {subCats.map((sub) => (
-                                        <SheetClose asChild key={sub.id}>
+                                <AccordionItem value={link.id} key={link.id} className="border-b-0">
+                                  <AccordionTrigger className={`flex items-center gap-3 px-3 py-3 rounded-xl font-serif-bn font-bold text-base transition-all hover:no-underline hover:bg-foreground/5 ${isActive(link.url) ? "text-primary" : "text-foreground/80"}`}>
+                                    <div className="flex items-center gap-3">
+                                      <span>{link.label}</span>
+                                    </div>
+                                  </AccordionTrigger>
+                                  <AccordionContent className="pb-1 pl-6 pr-3">
+                                    <div className="flex flex-col space-y-1">
+                                      {link.children.map((child: any) => (
+                                        <SheetClose asChild key={child.id}>
                                           <Link
-                                            to={`/blogs?cat=${sub.id}`}
-                                            className="block px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:bg-foreground/5 hover:text-primary transition-colors"
+                                            to={child.url}
+                                            className="block px-3 py-2 rounded-lg text-sm text-foreground/80 hover:bg-foreground/5 hover:text-primary transition-colors font-medium"
                                           >
-                                            {sub.name}
+                                            {child.label}
                                           </Link>
                                         </SheetClose>
                                       ))}
                                     </div>
-                                  )}
-                                </div>
+                                  </AccordionContent>
+                                </AccordionItem>
                               );
-                            })}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-
-                      {/* COURSES ACCORDION
-                      <AccordionItem value="courses" className="border-b-0">
-                        <AccordionTrigger className={`flex items-center gap-3 px-3 py-3 rounded-xl font-serif-bn font-bold text-base transition-all hover:no-underline hover:bg-foreground/5 ${isActive("/courses") ? "text-primary" : "text-foreground/80"}`}>
-                          <div className="flex items-center gap-3">
-                            <GraduationCap className="h-5 w-5 shrink-0" />
-                            <span>কোর্স</span>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="pb-1 pl-11 pr-3">
-                          <div className="flex flex-col space-y-1">
-                            <SheetClose asChild>
-                              <Link to="/courses" className="block px-3 py-2 rounded-lg text-sm text-foreground/80 hover:bg-foreground/5 hover:text-primary transition-colors">
-                                সব কোর্স
-                              </Link>
-                            </SheetClose>
-                            {courseCategories.map((c) => (
-                              <SheetClose asChild key={c.id}>
+                            }
+                            return (
+                              <SheetClose asChild key={link.id}>
                                 <Link
-                                  to={`/courses?cat=${c.id}`}
-                                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-foreground/80 hover:bg-foreground/5 hover:text-primary transition-colors"
+                                  to={link.url}
+                                  className={`flex items-center gap-3 px-3 py-3 rounded-xl font-serif-bn font-bold text-base transition-all ${
+                                    isActive(link.url) && (link.url === "/" ? location.pathname === "/" : true)
+                                      ? "bg-primary/10 text-primary"
+                                      : "text-foreground/80 hover:bg-foreground/5"
+                                  }`}
                                 >
-                                  <span className="opacity-70">{c.icon}</span>
-                                  <span>{c.name}</span>
+                                  <span>{link.label}</span>
                                 </Link>
                               </SheetClose>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem> */}
+                            );
+                          });
+                        })()
+                      ) : (
+                        <>
+                          {/* HOME */}
+                          <SheetClose asChild>
+                            <Link
+                              to="/"
+                              className={`flex items-center gap-3 px-3 py-3 rounded-xl font-serif-bn font-bold text-base transition-all ${
+                                location.pathname === "/"
+                                  ? "bg-primary/10 text-primary"
+                                  : "text-foreground/80 hover:bg-foreground/5"
+                              }`}
+                            >
+                              <Home className="h-5 w-5 shrink-0" />
+                              <span>হোম</span>
+                            </Link>
+                          </SheetClose>
 
-                      {/* OTHER LINKS */}
-                      {[
-                        { to: "/library", label: "লাইব্রেরি", Icon: Library, match: isActive("/library") },
-                        { to: "/wishlist", label: "উইশলিস্ট", Icon: Heart, match: isActive("/wishlist") },
-                        { to: "/leaderboard", label: "লিডারবোর্ড", Icon: Trophy, match: isActive("/leaderboard") },
-                      ].map(({ to, label, Icon, match }) => (
-                        <SheetClose asChild key={to}>
-                          <Link
-                            to={to}
-                            className={`flex items-center gap-3 px-3 py-3 rounded-xl font-serif-bn font-bold text-base transition-all ${
-                              match
-                                ? "bg-primary/10 text-primary"
-                                : "text-foreground/80 hover:bg-foreground/5"
-                            }`}
-                          >
-                            <Icon className="h-5 w-5 shrink-0" />
-                            <span>{label}</span>
-                          </Link>
-                        </SheetClose>
-                      ))}
+                          {/* QA */}
+                          <SheetClose asChild>
+                            <Link
+                              to="/qa"
+                              className={`flex items-center gap-3 px-3 py-3 rounded-xl font-serif-bn font-bold text-base transition-all ${
+                                isActive("/qa")
+                                  ? "bg-primary/10 text-primary"
+                                  : "text-foreground/80 hover:bg-foreground/5"
+                              }`}
+                            >
+                              <HelpCircle className="h-5 w-5 shrink-0" />
+                              <span>আপনার জিজ্ঞাসা</span>
+                            </Link>
+                          </SheetClose>
+
+                          {/* LIBRARY */}
+                          <SheetClose asChild>
+                            <Link
+                              to="/library"
+                              className={`flex items-center gap-3 px-3 py-3 rounded-xl font-serif-bn font-bold text-base transition-all ${
+                                isActive("/library")
+                                  ? "bg-primary/10 text-primary"
+                                  : "text-foreground/80 hover:bg-foreground/5"
+                              }`}
+                            >
+                              <Library className="h-5 w-5 shrink-0" />
+                              <span>লাইব্রেরি</span>
+                            </Link>
+                          </SheetClose>
+                        </>
+                      )}
                     </Accordion>
                   </div>
 

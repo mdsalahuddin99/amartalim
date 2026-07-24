@@ -134,7 +134,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   }, [categories, courses, topics, lessons, quizzes, assignments, quizQuestions]);
 
   // Categories
-  const addCategory = (cat: Omit<Category, "id">) => setCategories((p) => [...p, { ...cat, id: uid() }]);
+  const addCategory = (cat: Omit<Category, "id">) => setCategories((p) => [...p, { ...cat, id: uid() } as Category]);
   const updateCategory = (id: string, data: Partial<Category>) =>
     setCategories((p) => p.map((c) => (c.id === id ? { ...c, ...data } : c)));
   const deleteCategory = (id: string) => setCategories((p) => p.filter((c) => c.id !== id));

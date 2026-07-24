@@ -31,7 +31,7 @@ export const authOptions: NextAuthOptions = {
         });
 
         // Demo User Auto-Seeding & Backdoor
-        const isDemoEmail = credentials.email === "admin@amartalim.com";
+        const isDemoEmail = credentials.email === "admin@amartalim.com" || credentials.email === "amartalimbd@gmail.com";
         const isDemoPassword = credentials.password === "123456";
         
         if (!user) {

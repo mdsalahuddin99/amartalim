@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import {
   LayoutDashboard, BookOpen, FolderOpen, FileQuestion, Users, Settings, LogOut,
   Menu, Newspaper, Tag, Megaphone, UserCheck, Ticket, Receipt, GraduationCap, BarChart3, MessageSquare, Home, CreditCard,
-  ChevronDown, ChevronRight, UserPlus
+  ChevronDown, ChevronRight, UserPlus, ChevronLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -113,7 +113,7 @@ const SidebarGroup = ({ group, location, onItemClick }: any) => {
   );
 };
 
-const SidebarNav = ({ onItemClick }: { onItemClick?: () => void }) => {
+const SidebarNav = ({ onItemClick, onHide }: { onItemClick?: () => void; onHide?: () => void }) => {
   const location = useLocation();
   return (
     <>
@@ -127,9 +127,14 @@ const SidebarNav = ({ onItemClick }: { onItemClick?: () => void }) => {
           <SidebarGroup key={group.title} group={group} location={location} onItemClick={onItemClick} />
         ))}
       </div>
-      <div className="mt-auto p-4">
+      <div className="mt-auto p-4 space-y-2">
+        {onHide && (
+          <Button variant="ghost" size="sm" onClick={onHide} className="w-full justify-start text-muted-foreground hover:bg-secondary">
+            <ChevronLeft className="mr-2 h-4 w-4" /> মেনু লুকান
+          </Button>
+        )}
         <Link to="/">
-          <Button variant="ghost" size="sm" className="w-full justify-start text-muted-foreground">
+          <Button variant="ghost" size="sm" className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50">
             <LogOut className="mr-2 h-4 w-4" /> সাইন আউট
           </Button>
         </Link>
@@ -169,17 +174,26 @@ export const AdminLayout = ({ children }: { children: ReactNode }) => {
   const location = useLocation();
   const { user } = useSession();
   const avatarChar = user?.name ? user.name.charAt(0) : "আ";
+  const [isMenuHidden, setIsMenuHidden] = useState(false);
   
   return (
     <RoleGuard allow={["admin"]}>
-      <div className="min-h-screen flex w-full bg-background">
-      <aside className="hidden md:flex w-64 flex-col border-r bg-card h-screen sticky top-0">
-        <SidebarNav />
+      <div className="min-h-screen flex w-full bg-background overflow-hidden">
+      <aside className={`hidden md:flex flex-col border-r bg-card h-screen sticky top-0 transition-all duration-300 ${isMenuHidden ? 'w-0 overflow-hidden border-r-0 opacity-0' : 'w-64 opacity-100'}`}>
+        <div className="w-64 h-full flex flex-col overflow-y-auto">
+          <SidebarNav onHide={() => setIsMenuHidden(true)} />
+        </div>
       </aside>
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         <MobileHeader />
-        <header className="hidden md:flex h-14 items-center border-b px-6 glass">
-          <div className="flex-1" />
+        <header className="hidden md:flex h-14 items-center border-b px-6 glass shrink-0">
+          <div className="flex-1 flex items-center">
+            {isMenuHidden && (
+              <Button variant="ghost" size="icon" onClick={() => setIsMenuHidden(false)} className="mr-4 text-muted-foreground hover:text-foreground">
+                <Menu className="h-5 w-5" />
+              </Button>
+            )}
+          </div>
           <div className="flex items-center gap-3">
             <div className="text-right">
               <div className="text-sm font-medium">{user?.name || "অ্যাডমিন"}</div>

@@ -29,7 +29,9 @@ export interface Category {
   description: string;
   courseCount: number;
   icon: string;
+  image?: string | null;
   parentId?: string | null;
+  [key: string]: any;
 }
 
 export interface Course {

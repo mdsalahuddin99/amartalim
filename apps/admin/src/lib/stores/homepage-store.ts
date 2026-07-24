@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { api } from "@/lib/api-client";
-import { driver } from "@/lib/data-driver";
+import { getAdminHomepageContent, saveHomepageContent } from "@/server/actions/homepage.actions";
 
 /**
  * Homepage content store — dynamic blocks editable from /admin/homepage.
@@ -42,15 +41,48 @@ export interface PartnerItem {
 }
 
 export interface HomepageContent {
-  counters: { enabled: boolean; title?: string; items: CounterItem[] };
-  categories: { enabled: boolean; title?: string; items: CategoryItem[] };
-  testimonials: { enabled: boolean; title?: string; items: TestimonialItem[] };
-  partners: { enabled: boolean; title?: string; items: PartnerItem[] };
+  hero?: {
+    badge: string;
+    titleLine1: string;
+    titleLine2: string;
+    titleSuffix: string;
+    description: string;
+    statsText: string;
+    image?: string;
+  };
+  features?: { title: string; subtitle: string; };
+  courseCategoriesSection?: { title: string; subtitle: string; };
+  comingSoon?: { title: string; subtitle: string; };
+  qa?: { title: string; subtitle: string; };
+  library?: { title: string; subtitle: string; };
+  blogs?: { title: string; subtitle: string; };
+  cta?: { title: string; subtitle: string; };
+  
+  counters: { enabled: boolean; title?: string; subtitle?: string; items: CounterItem[] };
+  categories: { enabled: boolean; title?: string; subtitle?: string; items: CategoryItem[] };
+  testimonials: { enabled: boolean; title?: string; subtitle?: string; items: TestimonialItem[] };
+  partners: { enabled: boolean; title?: string; subtitle?: string; items: PartnerItem[] };
 }
 
 const RES = "homepage-content";
 
 const DEFAULTS: HomepageContent = {
+  hero: {
+    badge: "দেশের অন্যতম সেরা ইসলামিক লার্নিং প্ল্যাটফর্ম",
+    titleLine1: "আরবী ভাষা ও ইসলাম শিক্ষার",
+    titleLine2: "পাশাপাশি আধুনিক স্কিল",
+    titleSuffix: "শিখুন",
+    description: "কুরআন সুন্নাহর আলোকে জীবন গড়ার পাশাপাশি আধুনিক প্রযুক্তিতে নিজেকে দক্ষ করে তুলতে আমাদের সাথে যুক্ত হোন। ঘরে বসেই শুরু করুন আপনার নতুন স্কিল শেখার যাত্রা।",
+    statsText: "১০,০০০+ শিক্ষার্থীর ভরসা",
+    image: ""
+  },
+  features: { title: "আমাদের সেবাসমূহ", subtitle: "এক নজরে আমাদের প্ল্যাটফর্মের মূল ফিচারগুলো, যা আপনাকে দ্বীন ও দুনিয়ার সমন্বয়ে গড়ে উঠতে সাহায্য করবে" },
+  courseCategoriesSection: { title: "জনপ্রিয় কোর্স ক্যাটাগরি", subtitle: "আপনার পছন্দের বিষয় বেছে নিয়ে আজই শুরু করুন নতুন কিছু শেখা" },
+  comingSoon: { title: "শিগগিরই আসছে আমাদের চমৎকার কিছু কোর্স!", subtitle: "আমরা কাজ করে যাচ্ছি আপনাদের জন্য যুগোপযোগী এবং মানসম্মত কিছু প্রিমিয়াম কোর্স নিয়ে আসার। ওয়েব ডেভেলপমেন্ট, ফ্রিল্যান্সিং, কুরআন শিক্ষা সহ আরো অনেক কোর্স খুব শীঘ্রই লঞ্চ হতে যাচ্ছে।" },
+  qa: { title: "সাম্প্রতিক প্রশ্ন ও উত্তর", subtitle: "আমাদের অভিজ্ঞ মুফতি সাহেবদের থেকে আপনার দৈনন্দিন জীবনের বিভিন্ন মাসআলা ও সমাধান জেনে নিন।" },
+  library: { title: "সমৃদ্ধ ই-লাইব্রেরি অফুরন্ত জ্ঞানের ভাণ্ডার", subtitle: "আমাদের লাইব্রেরিতে রয়েছে কুরআন তিলাওয়াত, তাফসির, হাদিস, ফিকহ, ইসলামী সাহিত্য এবং টেকনোলজি রিলেটেড হাজারো পিডিএফ বইয়ের সমাহার। জ্ঞান অন্বেষণে এখনই ব্রাউজ করুন আমাদের কালেকশন।" },
+  blogs: { title: "সর্বশেষ ব্লগসমূহ", subtitle: "নতুন প্রকাশিত প্রবন্ধ ও আর্টিকেলগুলো পড়ুন এবং জ্ঞান অর্জন করুন" },
+  cta: { title: "জ্ঞানের এই যাত্রায় আমাদের সাথেই থাকুন", subtitle: "ফ্রি একাউন্ট তৈরি করে কোর্সে এনরোল করুন, প্রশ্ন করুন এবং লাইব্রেরি থেকে প্রয়োজনীয় বই ডাউনলোড করুন। আজই শুরু করুন আপনার নতুন যাত্রা।" },
   counters: {
     enabled: true,
     title: "আমাদের যাত্রায় আপনিও যুক্ত হোন",
@@ -123,36 +155,23 @@ const DEFAULTS: HomepageContent = {
   },
 };
 
-const read = (): HomepageContent => {
-  const v = driver.readJson<HomepageContent | null>(RES, null as any);
-  if (!v) return DEFAULTS;
-  // shallow-merge missing keys with defaults so additions don't break
-  return {
-    counters: { ...DEFAULTS.counters, ...(v.counters || {}) },
-    categories: { ...DEFAULTS.categories, ...(v.categories || {}) },
-    testimonials: { ...DEFAULTS.testimonials, ...(v.testimonials || {}) },
-    partners: { ...DEFAULTS.partners, ...(v.partners || {}) },
-  };
-};
-
 export const homepageStore = {
-  get: read,
-  save: (c: HomepageContent) => {
-    void api.put("/homepage", c).catch(() => {});
+  save: async (c: HomepageContent) => {
+    await saveHomepageContent(c);
   },
-  reset: () => {
-    void api.del("/homepage").catch(() => {});
+  reset: async () => {
+    await saveHomepageContent(DEFAULTS);
   },
 };
 
 export function useHomepageContent() {
-  const [content, setContent] = useState<HomepageContent>(() => read());
+  const [content, setContent] = useState<HomepageContent>(DEFAULTS);
+  
   useEffect(() => {
-    const refresh = () => setContent(read());
-    void api.get<HomepageContent>("/homepage").catch(() => {});
-    return driver.subscribe(RES, refresh);
+    getAdminHomepageContent().then((data) => setContent(data));
   }, []);
-  return content;
+  
+  return { content, setContent };
 }
 
 export { DEFAULTS as HOMEPAGE_DEFAULTS };

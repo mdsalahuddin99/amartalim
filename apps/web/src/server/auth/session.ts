@@ -35,7 +35,7 @@ const read = (): SessionUser | null => {
 export const resolveRoleForEmail = (email: string): SessionRole => {
   const e = (email || "").trim().toLowerCase();
   if (!e) return "student";
-  if (e === "admin@amartalim.com" || e.startsWith("admin@") || e.startsWith("admin.")) return "admin";
+  if (e === "amartalimbd@gmail.com" || e === "admin@amartalim.com" || e.startsWith("admin@") || e.startsWith("admin.")) return "admin";
   if (
     e === "instructor@amartalim.com" ||
     e.startsWith("instructor@") ||

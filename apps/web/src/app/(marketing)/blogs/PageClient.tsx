@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "@/lib/navigation";
 import { Calendar, Clock, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import SharedNavbar from "@/components/shared/navbar";
+import SharedFooter from "@/components/shared/footer";
 import NewsletterCTA from "@/components/blog/NewsletterCTA";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -124,23 +125,17 @@ const Blogs = ({
       <SharedNavbar showAuth />
 
       {/* Masthead title */}
-      <section className="border-b border-foreground/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-14 text-center">
-          <p className="eyebrow mb-2 sm:mb-3 text-[10px] sm:text-xs">আর্কাইভ</p>
-          <h1 className="font-serif-bn font-black text-3xl sm:text-6xl tracking-tight leading-[1.05] break-words">
+      <section className="border-b border-foreground/10 bg-background/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 sm:py-8 text-center flex flex-col items-center justify-center">
+          <h1 className="font-serif-bn font-bold text-2xl sm:text-4xl tracking-tight leading-tight text-foreground">
             {activeCat === "all" ? "সব আর্টিকেল" : activeCatName}
           </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-3 sm:mt-4 max-w-xl mx-auto px-2 leading-relaxed">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-2 max-w-lg mx-auto">
             শেখা, ক্যারিয়ার, AI ও ইসলামিক বিষয় নিয়ে আমাদের লেখকদের গভীর গবেষণাভিত্তিক আর্টিকেল।
           </p>
-
-          {/* Article count */}
-          <div className="rule-thin mt-5 sm:mt-8 pt-3 sm:pt-4">
-            <p className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground mb-3">
-              {filtered.length} আর্টিকেল
-            </p>
-
-
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium mt-3">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            {filtered.length} আর্টিকেল
           </div>
         </div>
       </section>
@@ -317,6 +312,8 @@ const Blogs = ({
           <NewsletterCTA />
         </div>
       </section>
+
+      <SharedFooter />
     </div>
   );
 };

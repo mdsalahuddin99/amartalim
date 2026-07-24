@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "@/lib/navigation";
 import { Calendar, Clock, ArrowLeft } from "lucide-react";
 import SharedNavbar from "@/components/shared/navbar";
+import SharedFooter from "@/components/shared/footer";
 import ReadingProgress from "@/components/blog/ReadingProgress";
 import TableOfContents from "@/components/blog/TableOfContents";
 import ShareButtons from "@/components/blog/ShareButtons";
@@ -448,6 +449,7 @@ const BlogDetail = ({
       )}
 
       <RelatedPosts posts={related} />
+      <SharedFooter />
     </div>
   );
 };

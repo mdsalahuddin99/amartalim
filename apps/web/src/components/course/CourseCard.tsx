@@ -1,6 +1,7 @@
 import { Link } from "@/lib/navigation";
-import { BookOpen, Clock, Users } from "lucide-react";
+import { BookOpen, Clock, Users, Eye } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import ReviewRating from "./ReviewRating";
@@ -46,37 +47,31 @@ const CourseCard = ({ course, variant = "grid", className }: Props) => {
 
 /* ─── Grid (default) ─────────────────────────────── */
 const GridCard = ({ course, className }: { course: CourseCardData; className?: string }) => (
-  <Card className={cn("overflow-hidden flex flex-col group hover:shadow-md transition-shadow", className)}>
-    <Link to={hrefOf(course)} className="block overflow-hidden bg-muted">
+  <Card className={cn("flex flex-col group hover:shadow-md transition-all border rounded-xl overflow-hidden bg-background p-2.5", className)}>
+    <Link to={hrefOf(course)} className="block overflow-hidden rounded-lg bg-muted relative">
       {course.thumbnail ? (
         <img
           src={course.thumbnail}
           alt={course.title}
           loading="lazy"
-          className="aspect-video w-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+          className="aspect-[4/5] w-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
         />
       ) : (
-        <div className="aspect-video bg-gradient-hero" />
+        <div className="aspect-[4/5] bg-gradient-hero" />
       )}
     </Link>
-    <div className="p-4 flex-1 flex flex-col">
+    <div className="pt-3 pb-1 px-1.5 flex-1 flex flex-col">
       {course.categoryName && (
         <Badge variant="secondary" className="self-start mb-2 text-[10px]">
           {course.categoryName}
         </Badge>
       )}
       <Link to={hrefOf(course)}>
-        <h3 className="font-semibold line-clamp-2 group-hover:text-primary transition-colors">
+        <h3 className="font-bold text-[15px] leading-snug line-clamp-2 group-hover:text-primary transition-colors">
           {course.title}
         </h3>
       </Link>
-      {course.instructor && (
-        <p className="text-xs text-muted-foreground mt-1 truncate">
-          {course.instructor}
-        </p>
-      )}
-      <Meta course={course} className="mt-3" />
-      <Footer course={course} className="mt-3 pt-3 border-t border-border/50" />
+      <Footer course={course} className="mt-auto pt-4" />
     </div>
   </Card>
 );
@@ -200,18 +195,20 @@ const Footer = ({ course, className }: { course: CourseCardData; className?: str
     );
   }
   return (
-    <div className={cn("flex items-end justify-between", className)}>
-      <div>
-        <p className="text-lg font-bold text-primary">{formatBDT(course.price)}</p>
+    <div className={cn("flex items-center justify-between", className)}>
+      <div className="flex items-center gap-1.5">
+        <p className="text-[17px] font-bold text-orange-500">{formatBDT(course.price)}</p>
         {course.originalPrice && course.originalPrice > course.price && (
-          <p className="text-xs text-muted-foreground line-through">
+          <p className="text-[12px] text-muted-foreground line-through opacity-70">
             ৳{course.originalPrice.toLocaleString("bn-BD")}
           </p>
         )}
       </div>
-      {course.level && (
-        <Badge variant="outline" className="text-[10px]">{course.level}</Badge>
-      )}
+      <Link to={hrefOf(course)} onClick={(e) => e.stopPropagation()}>
+        <Button size="sm" className="bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-md h-7 px-3 text-[11px] flex items-center gap-1.5">
+          Details <Eye className="w-3.5 h-3.5" />
+        </Button>
+      </Link>
     </div>
   );
 };

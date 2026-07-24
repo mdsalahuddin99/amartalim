@@ -1,7 +1,12 @@
+export const dynamic = "force-dynamic";
+
 import { Metadata } from "next";
 import HomeClient from "./HomeClient";
 import { buildHomeJsonLd } from "@/components/marketing/home";
 import { getPublishedBlogs, getBlogCategories } from "@/server/queries/blog.queries";
+import { getHomepageContent } from "@/server/queries/homepage.queries";
+import { getQaPosts } from "@/server/actions/qa.actions";
+import { prisma } from "@/server/db/prisma";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
@@ -31,11 +36,19 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MarketingHomePage() {
-  const [posts, categories] = await Promise.all([
+  const [posts, categories, homepageContent, qaResult, courseCategories, libraryBooks, totalLibraryBooks] = await Promise.all([
     getPublishedBlogs(),
     getBlogCategories(),
+    getHomepageContent(),
+    getQaPosts({ status: "PUBLISHED" }),
+    prisma.courseCategory.findMany({ include: { _count: { select: { courses: true } } } }),
+    prisma.book.findMany({ where: { status: "published" }, orderBy: { createdAt: "desc" }, take: 3, select: { id: true, title: true, cover: true, slug: true } }),
+    prisma.book.count({ where: { status: "published" } })
   ]);
   const jsonLd = buildHomeJsonLd(SITE_URL, posts);
+  
+  // get 3-4 recent qa posts
+  const qaPosts = qaResult.ok && qaResult.data ? qaResult.data.slice(0, 4) : [];
 
   return (
     <>
@@ -43,7 +56,15 @@ export default async function MarketingHomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <HomeClient posts={posts} categories={categories} />
+      <HomeClient 
+        posts={posts} 
+        categories={categories} 
+        homepageContent={homepageContent}
+        qaPosts={qaPosts}
+        courseCategories={courseCategories}
+        libraryBooks={libraryBooks}
+        totalLibraryBooks={totalLibraryBooks}
+      />
     </>
   );
 }

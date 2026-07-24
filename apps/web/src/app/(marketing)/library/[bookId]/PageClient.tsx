@@ -74,6 +74,7 @@ const BookReader = ({ initialBook }: { initialBook: any }) => {
                 <div className="flex flex-wrap justify-center sm:justify-start gap-3">
                   <Button
                     onClick={() => setIsReading(true)}
+                    disabled={!book.chapters || book.chapters.length === 0}
                     className="rounded-xl font-semibold bg-primary-foreground text-primary hover:bg-primary-foreground/90"
                   >
                     <BookOpen className="mr-2 h-4 w-4" /> পড়া শুরু করুন
@@ -137,7 +138,7 @@ const BookReader = ({ initialBook }: { initialBook: any }) => {
   }
 
   // Reading Mode
-  const chapter = book.chapters[activeChapter];
+  const chapter = book.chapters && book.chapters.length > 0 ? book.chapters[activeChapter] : null;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -194,29 +195,35 @@ const BookReader = ({ initialBook }: { initialBook: any }) => {
         {/* Reader Content */}
         <div className="flex-1 overflow-y-auto">
           <AnimatePresence mode="wait">
-            <motion.article
-              key={activeChapter}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="max-w-2xl mx-auto px-5 sm:px-8 py-8 sm:py-12"
-            >
-              <h2 className="text-xl sm:text-2xl font-bold mb-6 text-primary">{chapter.title}</h2>
-              {chapter.image && (
-                <img
-                  src={chapter.image}
-                  alt={chapter.title}
-                  className="w-full rounded-xl border border-border/50 mb-6 object-cover max-h-80"
-                />
-              )}
-              <div className="prose prose-sm sm:prose-base max-w-none">
-                {chapter.content.split("\n\n").map((para, i) => (
-                  <p key={i} className="text-sm sm:text-base leading-relaxed text-foreground/90 mb-4 whitespace-pre-line">
-                    {para}
-                  </p>
-                ))}
+            {chapter ? (
+              <motion.article
+                key={activeChapter}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="max-w-2xl mx-auto px-5 sm:px-8 py-8 sm:py-12"
+              >
+                <h2 className="text-xl sm:text-2xl font-bold mb-6 text-primary">{chapter.title}</h2>
+                {chapter.image && (
+                  <img
+                    src={chapter.image}
+                    alt={chapter.title}
+                    className="w-full rounded-xl border border-border/50 mb-6 object-cover max-h-80"
+                  />
+                )}
+                <div className="prose prose-sm sm:prose-base max-w-none">
+                  {chapter.content.split("\n\n").map((para, i) => (
+                    <p key={i} className="text-sm sm:text-base leading-relaxed text-foreground/90 mb-4 whitespace-pre-line">
+                      {para}
+                    </p>
+                  ))}
+                </div>
+              </motion.article>
+            ) : (
+              <div className="max-w-2xl mx-auto px-5 sm:px-8 py-16 text-center text-muted-foreground">
+                এই বইটিতে এখনো কোনো অধ্যায় যোগ করা হয়নি।
               </div>
-            </motion.article>
+            )}
           </AnimatePresence>
 
           {/* Navigation */}

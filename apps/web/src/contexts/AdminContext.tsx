@@ -12,7 +12,7 @@ import {
 import { toast } from "sonner";
 
 // Types
-export interface Category { id: string; name: string; slug: string; description?: string; parentId?: string | null; icon?: any; courseCount?: number; }
+export interface Category { id: string; name: string; slug: string; description?: string; parentId?: string | null; icon?: any; image: string | null; courseCount?: number; [key: string]: any; }
 export interface Course { id: string; title: string; published: boolean; [key: string]: any; }
 export interface Topic { id: string; courseId: string; title: string; summary?: string; order: number; }
 export interface Lesson { id: string; courseId: string; topicId?: string; title: string; order: number; [key: string]: any; }
@@ -105,7 +105,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   // Debounced persistence removed since we use db
 
   // Categories
-  const addCategory = (cat: Omit<Category, "id">) => setCategories((p) => [...p, { ...cat, id: uid() }]);
+  const addCategory = (cat: Omit<Category, "id">) => setCategories((p) => [...p, { ...cat, id: uid() } as Category]);
   const updateCategory = (id: string, data: Partial<Category>) => setCategories((p) => p.map((c) => (c.id === id ? { ...c, ...data } : c)));
   const deleteCategory = (id: string) => setCategories((p) => p.filter((c) => c.id !== id));
 

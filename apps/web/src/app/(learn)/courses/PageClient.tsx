@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import SharedNavbar from "@/components/shared/navbar";
+import SharedFooter from "@/components/shared/footer";
+import CourseCard from "@/components/course/CourseCard";
 
 import SmartImage from "@/components/shared/SmartImage";
 type ViewMode = "grid" | "list";
@@ -533,6 +535,7 @@ const Courses = ({ courses, categories }: PageClientProps) => {
           </>
         )}
       </AnimatePresence>
+      <SharedFooter />
     </div>
   );
 };

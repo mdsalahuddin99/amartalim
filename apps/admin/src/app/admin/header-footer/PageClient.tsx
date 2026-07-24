@@ -6,51 +6,53 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Trash2, Save, GripVertical } from "lucide-react";
+import { MenuBuilder } from "./MenuBuilder";
+import { saveHeaderFooterSettings } from "@/server/actions/settings";
 
-export default function PageClient() {
+export default function PageClient({ initialSettings }: { initialSettings: any }) {
   const [isSaving, setIsSaving] = useState(false);
 
   // Example state for Header
-  const [headerLinks, setHeaderLinks] = useState([
-    { id: 1, label: "হোম", url: "/" },
-    { id: 2, label: "কোর্সসমূহ", url: "/courses" },
-    { id: 3, label: "লাইব্রেরি", url: "/library" },
-    { id: 4, label: "ব্লগ", url: "/blogs" },
-  ]);
+  const [headerLinks, setHeaderLinks] = useState(initialSettings?.headerLinks || []);
 
   // Example state for Footer
-  const [footerAbout, setFooterAbout] = useState("আমার তালিম একটি উন্মুক্ত ইসলামিক জ্ঞানভাণ্ডার। এখানে আপনি পাবেন কুরআন, হাদিস, ফিকহ এবং আধুনিক প্রযুক্তির সমন্বয়ে যুগোপযোগী শিক্ষা।");
-  const [contactInfo, setContactInfo] = useState({
-    email: "info@amartalim.com",
-    phone: "+880 1234 567890",
-    address: "ঢাকা, বাংলাদেশ",
-  });
+  const [footerLogo, setFooterLogo] = useState<string | null>(initialSettings?.footerLogo || null);
+  const [footerAbout, setFooterAbout] = useState(initialSettings?.footerAbout || "");
   
-  const [socialLinks, setSocialLinks] = useState({
-    facebook: "https://facebook.com/amartalim",
-    youtube: "https://youtube.com/amartalim",
+  const [socialLinks, setSocialLinks] = useState(initialSettings?.socialLinks || {
+    facebook: "",
+    youtube: "",
     twitter: "",
   });
 
+  const [footerSections, setFooterSections] = useState(initialSettings?.footerSections || []);
+  const [footerQuickLinks, setFooterQuickLinks] = useState(initialSettings?.footerQuickLinks || []);
+
   const handleSave = async () => {
     setIsSaving(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const data = {
+        headerLinks,
+        footerLogo,
+        footerAbout,
+        socialLinks,
+        footerSections,
+        footerQuickLinks,
+      };
+      await saveHeaderFooterSettings(data);
       toast({ title: "সফলভাবে সেভ করা হয়েছে!" });
+    } catch (e) {
+      toast({ title: "সেভ করতে সমস্যা হয়েছে!", variant: "destructive" });
+    } finally {
       setIsSaving(false);
-    }, 1000);
+    }
   };
 
-  const addHeaderLink = () => {
-    setHeaderLinks([...headerLinks, { id: Date.now(), label: "", url: "" }]);
-  };
-
-  const removeHeaderLink = (id: number) => {
-    setHeaderLinks(headerLinks.filter(l => l.id !== id));
-  };
-
-  const updateHeaderLink = (id: number, field: string, value: string) => {
-    setHeaderLinks(headerLinks.map(l => l.id === id ? { ...l, [field]: value } : l));
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const url = URL.createObjectURL(e.target.files[0]);
+      setFooterLogo(url);
+    }
   };
 
   return (
@@ -69,126 +71,95 @@ export default function PageClient() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-12">
           {/* Header Settings */}
-          <div className="bg-card border border-border/50 rounded-2xl p-5 shadow-sm space-y-5">
-            <div>
-              <h2 className="text-lg font-semibold">হেডার মেনু (Navigation)</h2>
-              <p className="text-sm text-muted-foreground mb-4">ওয়েবসাইটের উপরের দিকের মেনু আইটেমগুলো নির্ধারণ করুন।</p>
-              
-              <div className="space-y-3">
-                {headerLinks.map((link, index) => (
-                  <div key={link.id} className="flex items-center gap-2 bg-background border rounded-xl p-2">
-                    <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab active:cursor-grabbing" />
-                    <div className="grid grid-cols-2 gap-2 flex-1">
-                      <Input 
-                        placeholder="মেনুর নাম (উদাঃ হোম)" 
-                        value={link.label}
-                        onChange={(e) => updateHeaderLink(link.id, 'label', e.target.value)}
-                        className="h-9"
-                      />
-                      <Input 
-                        placeholder="ইউআরএল (উদাঃ /about)" 
-                        value={link.url}
-                        onChange={(e) => updateHeaderLink(link.id, 'url', e.target.value)}
-                        className="h-9"
-                      />
-                    </div>
-                    <Button variant="ghost" size="icon" onClick={() => removeHeaderLink(link.id)} className="h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-              <Button variant="outline" size="sm" onClick={addHeaderLink} className="mt-4 rounded-xl border-dashed w-full">
-                <Plus className="h-4 w-4 mr-1" /> নতুন মেনু যোগ করুন
-              </Button>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 pb-2 border-b">
+              <h2 className="text-xl font-bold">হেডার সেটিংস (Header)</h2>
             </div>
+            <MenuBuilder links={headerLinks as any} setLinks={setHeaderLinks as any} title="হেডার মেনু (Navigation)" description="ওয়েবসাইটের মেইন মেনু আইটেমগুলো নির্ধারণ করুন।" />
           </div>
 
           {/* Footer Settings */}
           <div className="space-y-6">
-            <div className="bg-card border border-border/50 rounded-2xl p-5 shadow-sm space-y-4">
-              <div>
-                <h2 className="text-lg font-semibold">ফুটার বিবরণ (About)</h2>
-                <p className="text-sm text-muted-foreground mb-3">ফুটারের বাম পাশে ওয়েবসাইটের সংক্ষিপ্ত পরিচিতি।</p>
-                <textarea 
-                  className="flex w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[100px] resize-y"
-                  value={footerAbout}
-                  onChange={(e) => setFooterAbout(e.target.value)}
-                  placeholder="আমাদের সম্পর্কে কিছু লিখুন..."
-                />
-              </div>
+            <div className="flex items-center gap-2 pb-2 border-b">
+              <h2 className="text-xl font-bold">ফুটার সেটিংস (Footer)</h2>
             </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-card border border-border/50 rounded-2xl p-5 shadow-sm space-y-6">
+                <div>
+                  <h2 className="text-lg font-semibold mb-3">লোগো (Logo)</h2>
+                  <div className="flex items-center gap-4">
+                    <div className="h-16 w-16 rounded-xl border border-dashed flex items-center justify-center bg-secondary/20 overflow-hidden">
+                      {footerLogo ? (
+                        <img src={footerLogo} alt="Logo preview" className="w-full h-full object-contain" />
+                      ) : (
+                        <span className="text-xs text-muted-foreground text-center px-2">লোগো নেই</span>
+                      )}
+                    </div>
+                    <div>
+                      <Input 
+                        type="file" 
+                        accept="image/*"
+                        onChange={handleLogoUpload}
+                        className="text-sm rounded-xl cursor-pointer file:cursor-pointer file:bg-secondary file:text-foreground file:border-0 file:rounded-md file:px-3 file:py-1 file:mr-3" 
+                      />
+                      <p className="text-xs text-muted-foreground mt-2">Recommended: PNG or SVG with transparent background</p>
+                    </div>
+                  </div>
+                </div>
 
-            <div className="bg-card border border-border/50 rounded-2xl p-5 shadow-sm space-y-4">
-              <div>
-                <h2 className="text-lg font-semibold mb-4">যোগাযোগের তথ্য (Contact)</h2>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium mb-1.5 block text-muted-foreground">ইমেইল এড্রেস</label>
-                    <Input 
-                      value={contactInfo.email}
-                      onChange={(e) => setContactInfo({...contactInfo, email: e.target.value})}
-                      placeholder="info@example.com"
-                      className="rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-1.5 block text-muted-foreground">ফোন নম্বর</label>
-                    <Input 
-                      value={contactInfo.phone}
-                      onChange={(e) => setContactInfo({...contactInfo, phone: e.target.value})}
-                      placeholder="+880..."
-                      className="rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-1.5 block text-muted-foreground">ঠিকানা</label>
-                    <Input 
-                      value={contactInfo.address}
-                      onChange={(e) => setContactInfo({...contactInfo, address: e.target.value})}
-                      placeholder="অফিসের ঠিকানা..."
-                      className="rounded-xl"
-                    />
+                <div>
+                  <h2 className="text-lg font-semibold mb-3">ফুটার বিবরণ (About)</h2>
+                  <textarea 
+                    className="flex w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[100px] resize-y"
+                    value={footerAbout}
+                    onChange={(e) => setFooterAbout(e.target.value)}
+                    placeholder="আমাদের সম্পর্কে কিছু লিখুন..."
+                  />
+                </div>
+              </div>
+
+              <div className="bg-card border border-border/50 rounded-2xl p-5 shadow-sm space-y-4">
+                <div>
+                  <h2 className="text-lg font-semibold mb-4">সোশ্যাল মিডিয়া (Social Links)</h2>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium mb-1.5 block text-muted-foreground">ফেসবুক পেজ ইউআরএল</label>
+                      <Input 
+                        value={socialLinks.facebook}
+                        onChange={(e) => setSocialLinks({...socialLinks, facebook: e.target.value})}
+                        placeholder="https://facebook.com/..."
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1.5 block text-muted-foreground">ইউটিউব চ্যানেল</label>
+                      <Input 
+                        value={socialLinks.youtube}
+                        onChange={(e) => setSocialLinks({...socialLinks, youtube: e.target.value})}
+                        placeholder="https://youtube.com/..."
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1.5 block text-muted-foreground">টুইটার / এক্স (Twitter/X)</label>
+                      <Input 
+                        value={socialLinks.twitter}
+                        onChange={(e) => setSocialLinks({...socialLinks, twitter: e.target.value})}
+                        placeholder="https://twitter.com/..."
+                        className="rounded-xl"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-card border border-border/50 rounded-2xl p-5 shadow-sm space-y-4">
-              <div>
-                <h2 className="text-lg font-semibold mb-4">সোশ্যাল মিডিয়া (Social Links)</h2>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium mb-1.5 block text-muted-foreground">ফেসবুক পেজ ইউআরএল</label>
-                    <Input 
-                      value={socialLinks.facebook}
-                      onChange={(e) => setSocialLinks({...socialLinks, facebook: e.target.value})}
-                      placeholder="https://facebook.com/..."
-                      className="rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-1.5 block text-muted-foreground">ইউটিউব চ্যানেল</label>
-                    <Input 
-                      value={socialLinks.youtube}
-                      onChange={(e) => setSocialLinks({...socialLinks, youtube: e.target.value})}
-                      placeholder="https://youtube.com/..."
-                      className="rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-1.5 block text-muted-foreground">টুইটার / এক্স (Twitter/X)</label>
-                    <Input 
-                      value={socialLinks.twitter}
-                      onChange={(e) => setSocialLinks({...socialLinks, twitter: e.target.value})}
-                      placeholder="https://twitter.com/..."
-                      className="rounded-xl"
-                    />
-                  </div>
-                </div>
-              </div>
+            <div className="space-y-8 mt-8">
+              <MenuBuilder links={footerSections as any} setLinks={setFooterSections as any} title="ফুটার মেনু ১: বিভাগ (Sections)" description="ফুটারের 'বিভাগ' কলামের লিংকগুলো সাজান।" />
+              <MenuBuilder links={footerQuickLinks as any} setLinks={setFooterQuickLinks as any} title="ফুটার মেনু ২: দ্রুত লিংক (Quick Links)" description="ফুটারের 'দ্রুত লিংক' কলামের লিংকগুলো সাজান।" />
             </div>
           </div>
         </div>

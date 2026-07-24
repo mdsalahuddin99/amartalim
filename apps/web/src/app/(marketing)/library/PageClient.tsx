@@ -7,6 +7,7 @@ import { BookOpen, Search, Star, Clock, Eye, Grid3X3, List } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import SharedNavbar from "@/components/shared/navbar";
+import SharedFooter from "@/components/shared/footer";
 import SmartImage from "@/components/shared/SmartImage";
 
 const Library = ({ initialBooks = [] }: { initialBooks: any[] }) => {
@@ -166,6 +167,7 @@ const Library = ({ initialBooks = [] }: { initialBooks: any[] }) => {
           </div>
         )}
       </div>
+      <SharedFooter />
     </div>
   );
 };

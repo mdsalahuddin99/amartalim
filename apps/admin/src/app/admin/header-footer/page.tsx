@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { auth } from "@/server/auth/auth";
 import { redirect } from "next/navigation";
 import PageClient from "./PageClient"; // Force TS server reload
+import { getHeaderFooterSettings } from "@/server/actions/settings";
 
 export const metadata: Metadata = {
   title: "হেডার ও ফুটার | অ্যাডমিন | Amar Talim",
@@ -13,5 +14,7 @@ export default async function HeaderFooterPage() {
     redirect("/login");
   }
 
-  return <PageClient />;
+  const settings = await getHeaderFooterSettings();
+
+  return <PageClient initialSettings={settings} />;
 }

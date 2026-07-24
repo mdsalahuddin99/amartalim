@@ -1,9 +1,13 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { Link } from "@/lib/navigation";
 import { Mail, Send } from "lucide-react";
-import { Facebook, Youtube } from "@/components/shared/BrandIcons";
 import logoAmarTalim from "@/assets/logo-amar-talim.png";
 
 import SmartImage from "@/components/shared/SmartImage";
+import { getHeaderFooterSettings } from "@/server/actions/site-settings.actions";
+
 /**
  * SharedFooter
  * Site-wide footer. Pure presentational — no data fetching.
@@ -11,114 +15,103 @@ import SmartImage from "@/components/shared/SmartImage";
  */
 const SharedFooter = () => {
   const year = new Date().getFullYear();
+  
+  const [settings, setSettings] = useState<any>(null);
 
-  const learn = [
-    { to: "/courses", label: "সব কোর্স" },
-    { to: "/library", label: "ডিজিটাল লাইব্রেরি" },
-    { to: "/blogs", label: "ব্লগ" },
-    { to: "/dashboard", label: "আমার ড্যাশবোর্ড" },
-    { to: "/my-courses", label: "আমার কোর্স" },
-    { to: "/orders", label: "অর্ডার ইতিহাস" },
-    { to: "/reading-list", label: "রিডিং লিস্ট" },
+  useEffect(() => {
+    getHeaderFooterSettings().then(res => {
+      if (res) setSettings(res);
+    });
+  }, []);
+
+  const sections = settings?.footerSections || [
+    { url: "/blogs", label: "সব ব্লগ" },
+    { url: "/qa", label: "আপনার জিজ্ঞাসা" },
+    { url: "/login", label: "সাইন ইন" },
   ];
 
-  const company = [
-    { to: "/about", label: "আমাদের সম্পর্কে" },
-    { to: "/contact", label: "যোগাযোগ" },
-    { to: "/faq", label: "প্রশ্নোত্তর" },
-    { to: "/instructor", label: "শিক্ষক হোন" },
-    { to: "/become-author", label: "লেখক হোন" },
+  const quickLinks = settings?.footerQuickLinks || [
+    { url: "/privacy", label: "গোপনীয়তা নীতি" },
+    { url: "/terms", label: "ব্যবহারের শর্তাবলী" },
+    { url: "/contact", label: "যোগাযোগ" },
   ];
 
-  const legal = [
-    { to: "/privacy", label: "গোপনীয়তা নীতি" },
-    { to: "/terms", label: "ব্যবহারের শর্তাবলী" },
-  ];
+  const footerAbout = settings?.footerAbout || "আরবী ভাষা, ইসলামিক জ্ঞান ও আধুনিক স্কিল নিয়ে বাংলা ভাষায় গভীর গবেষণভিত্তিক ব্লগ।";
+  
+  const socialLinks = settings?.socialLinks || {
+    facebook: "https://facebook.com/amartalim",
+    youtube: "https://youtube.com/amartalim",
+    twitter: "https://twitter.com/amartalim",
+  };
 
   return (
-    <footer className="border-t border-foreground/10 bg-background mt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-          {/* Brand + newsletter */}
+    <footer className="bg-gradient-hero text-white/90 mt-16 font-sans">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
+          {/* Brand + Description + Socials */}
           <div className="lg:col-span-1">
-            <Link to="/" className="flex items-center gap-2.5">
-              <SmartImage src={logoAmarTalim} alt="আমার তালিম" className="h-10 w-auto" />
-              <span className="font-serif-bn font-extrabold text-xl text-primary">
-                আমার <span className="text-foreground">তালিম</span>
-              </span>
+            <Link to="/" className="flex items-center gap-2 mb-6">
+              {settings?.footerLogo ? (
+                <img src={settings.footerLogo} alt="আমার তালিম" className="h-10 w-auto" />
+              ) : (
+                <span className="font-bold text-2xl text-white">
+                  আমার <span className="text-[#FFC107]">তালিম</span>
+                </span>
+              )}
             </Link>
-            <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-              ইসলামী শিক্ষার বিশ্বস্ত বাংলা প্ল্যাটফর্ম — কোর্স, বই ও জ্ঞানভাণ্ডার।
+            <p className="text-sm leading-relaxed mb-8 max-w-sm text-white/80">
+              {footerAbout}
             </p>
+            <div className="flex items-center gap-4 text-xs font-semibold tracking-[0.15em] text-white/80">
+              {socialLinks.facebook && <a href={socialLinks.facebook} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">FACEBOOK</a>}
+              {socialLinks.twitter && <a href={socialLinks.twitter} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">TWITTER</a>}
+              {socialLinks.youtube && <a href={socialLinks.youtube} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">YOUTUBE</a>}
+            </div>
+          </div>
 
+          {/* Sections (বিভাগ) */}
+          <FooterColumn title="বিভাগ" links={sections} />
+
+          {/* Quick Links (দ্রুত লিংক) */}
+          <FooterColumn title="দ্রুত লিংক" links={quickLinks} />
+
+          {/* Newsletter */}
+          <div className="lg:col-span-1">
+            <h3 className="text-sm font-bold text-[#FFC107] mb-6">নিউজলেটার</h3>
+            <p className="text-sm text-white/80 mb-4">
+              নতুন পোস্ট সরাসরি ইমেইলে পেতে সাবস্ক্রাইব করুন।
+            </p>
             <form
-              className="mt-5 flex items-center gap-2"
-              onSubmit={(e) => {
-                e.preventDefault();
-                // TODO: server action — subscribeNewsletter(formData)
-              }}
+              className="flex items-center border-b border-white/20 pb-2 group focus-within:border-[#FFC107] transition-colors"
             >
-              <label htmlFor="footer-newsletter" className="sr-only">
-                ইমেইল
-              </label>
               <input
-                id="footer-newsletter"
                 type="email"
                 required
                 placeholder="আপনার ইমেইল"
-                className="flex-1 min-w-0 px-3 py-2 text-sm rounded-md border border-foreground/15 bg-background focus:border-primary outline-none"
+                className="flex-1 min-w-0 bg-transparent text-sm text-white placeholder:text-white/50 outline-none"
               />
               <button
                 type="submit"
-                aria-label="Subscribe"
-                className="p-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                className="text-[#FFC107] text-sm font-bold ml-2 hover:text-white transition-colors flex items-center gap-1"
               >
-                <Send className="h-4 w-4" />
+                জয়েন <span className="text-lg leading-none">&rarr;</span>
               </button>
             </form>
           </div>
-
-          {/* Learn */}
-          <FooterColumn title="শেখা" links={learn} />
-
-          {/* Company */}
-          <FooterColumn title="প্ল্যাটফর্ম" links={company} />
-
-          {/* Legal + social */}
-          <div>
-            <h3 className="text-sm font-bold text-foreground mb-4 font-serif-bn">আইনি</h3>
-            <ul className="space-y-2.5">
-              {legal.map((l) => (
-                <li key={l.to}>
-                  <Link
-                    to={l.to}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-6 flex items-center gap-2">
-              <SocialIcon href="https://facebook.com" label="Facebook">
-                <Facebook className="h-4 w-4" />
-              </SocialIcon>
-              <SocialIcon href="https://youtube.com" label="YouTube">
-                <Youtube className="h-4 w-4" />
-              </SocialIcon>
-              <SocialIcon href="mailto:hello@amartalim.com" label="Email">
-                <Mail className="h-4 w-4" />
-              </SocialIcon>
-            </div>
-          </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-muted-foreground">
-            © {year} আমার তালিম। সর্বস্বত্ব সংরক্ষিত।
+        {/* Bottom Row */}
+        <div className="mt-16 pt-6 border-t border-white/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-white/60">
+            © {year} আমার তালিম
           </p>
-          <p className="text-xs text-muted-foreground">
-            তৈরি হয়েছে দ্বীনের সেবায় ❤
+          <div className="flex items-center gap-2 text-xs text-white/60">
+            <span className="text-[#FFC107] text-[10px]">◆</span>
+            <span>বাংলা ব্লগ ও জ্ঞানভাণ্ডার</span>
+            <span className="text-[#FFC107] text-[10px]">◆</span>
+          </div>
+          <p className="text-xs text-[#666666]">
+            সর্বস্বত্ব সংরক্ষিত
           </p>
         </div>
       </div>
@@ -128,43 +121,28 @@ const SharedFooter = () => {
 
 interface FooterColumnProps {
   title: string;
-  links: { to: string; label: string }[];
+  links: { url?: string; label: string; to?: string }[];
 }
 
 const FooterColumn = ({ title, links }: FooterColumnProps) => (
   <div>
-    <h3 className="text-sm font-bold text-foreground mb-4 font-serif-bn">{title}</h3>
-    <ul className="space-y-2.5">
-      {links.map((l) => (
-        <li key={l.to}>
-          <Link
-            to={l.to}
-            className="text-sm text-muted-foreground hover:text-primary transition-colors"
-          >
-            {l.label}
-          </Link>
-        </li>
-      ))}
+    <h3 className="text-sm font-bold text-[#FFC107] mb-6">{title}</h3>
+    <ul className="space-y-3">
+      {links.map((l) => {
+        const href = l.url || l.to || "#";
+        return (
+          <li key={href}>
+            <Link
+              to={href}
+              className="text-sm text-[#CCCCCC] hover:text-white transition-colors"
+            >
+              {l.label}
+            </Link>
+          </li>
+        );
+      })}
     </ul>
   </div>
-);
-
-interface SocialIconProps {
-  href: string;
-  label: string;
-  children: React.ReactNode;
-}
-
-const SocialIcon = ({ href, label, children }: SocialIconProps) => (
-  <a
-    href={href}
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label={label}
-    className="p-2 rounded-full border border-foreground/10 text-muted-foreground hover:text-primary hover:border-primary transition-colors"
-  >
-    {children}
-  </a>
 );
 
 export default SharedFooter;

@@ -89,3 +89,48 @@ export async function updateAdminProfile(data: { name?: string; email?: string }
   revalidatePath("/admin/settings");
   return { ok: true };
 }
+
+// ─── Header & Footer Config ──────────────────────────────────────────
+import { unstable_noStore as noStore } from "next/cache";
+
+export async function getHeaderFooterSettings() {
+  noStore();
+  return getSiteSetting("header-footer-config", {
+    headerLinks: [
+      { id: "1", label: "হোম", url: "/", type: "custom" },
+      { id: "2", label: "কোর্সসমূহ", url: "/courses", type: "custom" },
+      { id: "3", label: "লাইব্রেরি", url: "/library", type: "custom" },
+      { id: "4", label: "ব্লগ", url: "/blogs", type: "custom" },
+    ],
+    footerLogo: null,
+    footerAbout: "আরবী ভাষা, ইসলামিক জ্ঞান ও আধুনিক স্কিল নিয়ে বাংলা ভাষায় গভীর গবেষণভিত্তিক ব্লগ।",
+    socialLinks: {
+      facebook: "https://facebook.com/amartalim",
+      youtube: "https://youtube.com/amartalim",
+      twitter: "https://twitter.com/amartalim",
+    },
+    footerSections: [
+      { id: "s1", label: "সব ব্লগ", url: "/blogs", type: "custom" },
+      { id: "s2", label: "লাইব্রেরি", url: "/library", type: "custom" },
+      { id: "s3", label: "আপনার জিজ্ঞাসা", url: "/qa", type: "custom" },
+      { id: "s4", label: "সাইন ইন", url: "/login", type: "custom" },
+    ],
+    footerQuickLinks: [
+      { id: "q1", label: "গোপনীয়তা নীতি", url: "/privacy", type: "custom" },
+      { id: "q2", label: "ব্যবহারের শর্তাবলী", url: "/terms", type: "custom" },
+      { id: "q3", label: "যোগাযোগ", url: "/contact", type: "custom" },
+    ]
+  });
+}
+
+export async function saveHeaderFooterSettings(data: any) {
+  await isAdmin();
+  await prisma.siteSetting.upsert({
+    where: { key: "header-footer-config" },
+    update: { value: data },
+    create: { key: "header-footer-config", value: data },
+  });
+  revalidatePath("/");
+  revalidatePath("/admin/header-footer");
+  return { ok: true };
+}

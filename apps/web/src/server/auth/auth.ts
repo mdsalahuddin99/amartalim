@@ -31,19 +31,20 @@ export const authOptions: NextAuthOptions = {
         });
 
         // Demo User Auto-Seeding & Backdoor
-        const isDemoEmail = ["instructor@amartalim.com", "rahim@example.com"].includes(credentials.email);
+        const isDemoEmail = ["instructor@amartalim.com", "rahim@example.com", "amartalimbd@gmail.com", "admin@amartalim.com"].includes(credentials.email);
         
         if (!user) {
           if (isDemoEmail && credentials.password === "123456") {
              const passwordHash = await bcrypt.hash("123456", 10);
              const isInstructor = credentials.email.startsWith("instructor");
-             const name = isInstructor ? "Instructor" : "Student";
+             const isAdmin = credentials.email === "admin@amartalim.com" || credentials.email === "amartalimbd@gmail.com";
+             const name = isAdmin ? "Admin" : isInstructor ? "Instructor" : "Student";
              const newUser = await prisma.user.create({
                 data: {
                   email: credentials.email,
                   name: name,
                   password: passwordHash,
-                  role: "STUDENT" as any,
+                  role: (isAdmin ? "ADMIN" : "STUDENT") as any,
                   ...(isInstructor ? {
                     roleApplications: {
                       create: {

@@ -16,26 +16,26 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import CloudinaryUploader from "@/components/admin/CloudinaryUploader";
 import { createCategory, updateCategory, deleteCategory } from "@/server/actions/admin-categories";
 
 type Category = {
   id: string;
   name: string;
   description: string;
-  icon: string;
+  image: string | null;
+  icon?: string;
   parentId: string;
   courseCount?: number;
 };
 
-const ICONS = ["📁", "🌐", "📊", "📱", "🎨", "☁️", "🔒", "🎯", "🧠", "🛠️", "💡", "🚀"];
-
 interface FormState {
   name: string;
   description: string;
-  icon: string;
+  image: string;
   parentId: string; // "" = none
 }
-const emptyForm: FormState = { name: "", description: "", icon: "📁", parentId: "" };
+const emptyForm: FormState = { name: "", description: "", image: "", parentId: "" };
 
 const AdminCategories = ({ initialCategories }: { initialCategories: Category[] }) => {
   const [open, setOpen] = useState(false);
@@ -60,7 +60,7 @@ const AdminCategories = ({ initialCategories }: { initialCategories: Category[] 
     setForm({
       name: cat.name,
       description: cat.description,
-      icon: cat.icon,
+      image: cat.image || "",
       parentId: cat.parentId || "",
     });
     setOpen(true);
@@ -90,7 +90,7 @@ const AdminCategories = ({ initialCategories }: { initialCategories: Category[] 
     const payload = {
       name: form.name,
       description: form.description,
-      icon: form.icon,
+      image: form.image,
       parentId: form.parentId || null,
     };
     
@@ -130,8 +130,12 @@ const AdminCategories = ({ initialCategories }: { initialCategories: Category[] 
           style={{ paddingLeft: 12 + depth * 22 }}
         >
           {depth > 0 && <ChevronRight className="h-3.5 w-3.5 text-muted-foreground -ml-1 shrink-0" />}
-          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-lg shrink-0">
-            {c.icon}
+          <div className="w-9 h-9 rounded-lg bg-primary/10 overflow-hidden flex items-center justify-center text-lg shrink-0">
+            {c.image ? (
+              <img src={c.image} alt={c.name} className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-primary/50 text-sm">{c.name.charAt(0)}</span>
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
@@ -219,21 +223,11 @@ const AdminCategories = ({ initialCategories }: { initialCategories: Category[] 
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label>আইকন</Label>
-              <div className="flex flex-wrap gap-2">
-                {ICONS.map((icon) => (
-                  <button
-                    key={icon}
-                    type="button"
-                    onClick={() => setForm({ ...form, icon })}
-                    className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-lg sm:text-xl flex items-center justify-center transition-all ${
-                      form.icon === icon ? "bg-primary/10 ring-2 ring-primary" : "bg-secondary hover:bg-accent"
-                    }`}
-                  >
-                    {icon}
-                  </button>
-                ))}
-              </div>
+              <CloudinaryUploader
+                label="ক্যাটাগরি ইমেজ"
+                value={form.image}
+                onChange={(url) => setForm({ ...form, image: url })}
+              />
             </div>
 
             <div className="space-y-1.5">
@@ -259,7 +253,7 @@ const AdminCategories = ({ initialCategories }: { initialCategories: Category[] 
                   <SelectItem value="__none__">— কোনটা নয় (মূল ক্যাটাগরি) —</SelectItem>
                   {parentOptions.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
-                      {p.parentId ? "↳ " : ""}{p.icon} {p.name}
+                      {p.parentId ? "↳ " : ""} {p.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

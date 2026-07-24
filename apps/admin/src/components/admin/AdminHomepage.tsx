@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Trash2, RotateCcw, Save } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,16 +22,22 @@ import {
 const uid = () => `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
 const AdminHomepage = () => {
-  const initial = useHomepageContent();
-  const [draft, setDraft] = useState<HomepageContent>(initial);
+  const { content } = useHomepageContent();
+  const [draft, setDraft] = useState<HomepageContent>(content);
+  
+  useEffect(() => {
+    if (content) {
+      setDraft(content);
+    }
+  }, [content]);
 
-  const save = () => {
-    homepageStore.save(draft);
+  const save = async () => {
+    await homepageStore.save(draft);
     toast({ title: "সংরক্ষিত হয়েছে", description: "হোমপেজ আপডেট হয়েছে।" });
   };
 
-  const reset = () => {
-    homepageStore.reset();
+  const reset = async () => {
+    await homepageStore.reset();
     setDraft(HOMEPAGE_DEFAULTS);
     toast({ title: "ডিফল্ট রিস্টোর হয়েছে" });
   };
@@ -55,18 +61,168 @@ const AdminHomepage = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="counters">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs defaultValue="hero">
+        <TabsList className="grid w-full grid-cols-6 mb-8">
+          <TabsTrigger value="hero">হিরো</TabsTrigger>
+          <TabsTrigger value="sections">সেকশনসমূহ</TabsTrigger>
           <TabsTrigger value="counters">কাউন্টার</TabsTrigger>
           <TabsTrigger value="categories">ক্যাটাগরি</TabsTrigger>
           <TabsTrigger value="testimonials">টেস্টিমোনিয়াল</TabsTrigger>
           <TabsTrigger value="partners">পার্টনার</TabsTrigger>
         </TabsList>
+        
+        {/* Hero Section */}
+        <TabsContent value="hero">
+          <Card className="p-6 space-y-6">
+            <div>
+              <h2 className="text-lg font-bold mb-4">হিরো সেকশন সেটিংস</h2>
+              <div className="grid gap-6 md:grid-cols-2">
+                <Field label="ব্যাজ (Badge)">
+                  <Input 
+                    value={draft.hero?.badge || ""} 
+                    onChange={e => setDraft({ ...draft, hero: { ...draft.hero!, badge: e.target.value }})} 
+                  />
+                </Field>
+                <Field label="টাইটেল লাইন ১">
+                  <Input 
+                    value={draft.hero?.titleLine1 || ""} 
+                    onChange={e => setDraft({ ...draft, hero: { ...draft.hero!, titleLine1: e.target.value }})} 
+                  />
+                </Field>
+                <Field label="টাইটেল লাইন ২ (হাইলাইটেড)">
+                  <Input 
+                    value={draft.hero?.titleLine2 || ""} 
+                    onChange={e => setDraft({ ...draft, hero: { ...draft.hero!, titleLine2: e.target.value }})} 
+                  />
+                </Field>
+                <Field label="টাইটেল সাফিক্স">
+                  <Input 
+                    value={draft.hero?.titleSuffix || ""} 
+                    onChange={e => setDraft({ ...draft, hero: { ...draft.hero!, titleSuffix: e.target.value }})} 
+                  />
+                </Field>
+                <Field className="md:col-span-2" label="ডেসক্রিপশন">
+                  <Textarea 
+                    value={draft.hero?.description || ""} 
+                    onChange={e => setDraft({ ...draft, hero: { ...draft.hero!, description: e.target.value }})} 
+                    rows={3}
+                  />
+                </Field>
+                <Field label="স্ট্যাটস টেক্সট (Trust Indicators)">
+                  <Input 
+                    value={draft.hero?.statsText || ""} 
+                    onChange={e => setDraft({ ...draft, hero: { ...draft.hero!, statsText: e.target.value }})} 
+                  />
+                </Field>
+                <Field className="md:col-span-2" label="হিরো ইমেজ URL (Hero Image)">
+                  <Input 
+                    placeholder="https://..."
+                    value={draft.hero?.image || ""} 
+                    onChange={e => setDraft({ ...draft, hero: { ...draft.hero!, image: e.target.value }})} 
+                  />
+                </Field>
+              </div>
+            </div>
+          </Card>
+        </TabsContent>
+
+        {/* Sections */}
+        <TabsContent value="sections">
+          <Card className="p-6 space-y-6">
+            <h2 className="text-lg font-bold mb-4">সেকশন টাইটেল ও সাবটাইটেল</h2>
+            <div className="grid gap-8">
+              
+              <div className="space-y-4">
+                <h3 className="font-semibold text-primary">আমাদের সেবাসমূহ (Features)</h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="টাইটেল">
+                    <Input value={draft.features?.title || ""} onChange={e => setDraft({ ...draft, features: { ...draft.features!, title: e.target.value }})} />
+                  </Field>
+                  <Field label="সাবটাইটেল">
+                    <Input value={draft.features?.subtitle || ""} onChange={e => setDraft({ ...draft, features: { ...draft.features!, subtitle: e.target.value }})} />
+                  </Field>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="font-semibold text-primary">কোর্স ক্যাটাগরি</h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="টাইটেল">
+                    <Input value={draft.courseCategoriesSection?.title || ""} onChange={e => setDraft({ ...draft, courseCategoriesSection: { ...draft.courseCategoriesSection!, title: e.target.value }})} />
+                  </Field>
+                  <Field label="সাবটাইটেল">
+                    <Input value={draft.courseCategoriesSection?.subtitle || ""} onChange={e => setDraft({ ...draft, courseCategoriesSection: { ...draft.courseCategoriesSection!, subtitle: e.target.value }})} />
+                  </Field>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold text-primary">শিগগিরই আসছে (Coming Soon)</h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="টাইটেল">
+                    <Input value={draft.comingSoon?.title || ""} onChange={e => setDraft({ ...draft, comingSoon: { ...draft.comingSoon!, title: e.target.value }})} />
+                  </Field>
+                  <Field label="সাবটাইটেল">
+                    <Textarea value={draft.comingSoon?.subtitle || ""} onChange={e => setDraft({ ...draft, comingSoon: { ...draft.comingSoon!, subtitle: e.target.value }})} />
+                  </Field>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold text-primary">প্রশ্নোত্তর (QA)</h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="টাইটেল">
+                    <Input value={draft.qa?.title || ""} onChange={e => setDraft({ ...draft, qa: { ...draft.qa!, title: e.target.value }})} />
+                  </Field>
+                  <Field label="সাবটাইটেল">
+                    <Input value={draft.qa?.subtitle || ""} onChange={e => setDraft({ ...draft, qa: { ...draft.qa!, subtitle: e.target.value }})} />
+                  </Field>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold text-primary">লাইব্রেরি</h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="টাইটেল">
+                    <Input value={draft.library?.title || ""} onChange={e => setDraft({ ...draft, library: { ...draft.library!, title: e.target.value }})} />
+                  </Field>
+                  <Field label="সাবটাইটেল">
+                    <Textarea value={draft.library?.subtitle || ""} onChange={e => setDraft({ ...draft, library: { ...draft.library!, subtitle: e.target.value }})} />
+                  </Field>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold text-primary">ব্লগ</h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="টাইটেল">
+                    <Input value={draft.blogs?.title || ""} onChange={e => setDraft({ ...draft, blogs: { ...draft.blogs!, title: e.target.value }})} />
+                  </Field>
+                  <Field label="সাবটাইটেল">
+                    <Input value={draft.blogs?.subtitle || ""} onChange={e => setDraft({ ...draft, blogs: { ...draft.blogs!, subtitle: e.target.value }})} />
+                  </Field>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold text-primary">CTA Section</h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="টাইটেল">
+                    <Input value={draft.cta?.title || ""} onChange={e => setDraft({ ...draft, cta: { ...draft.cta!, title: e.target.value }})} />
+                  </Field>
+                  <Field label="সাবটাইটেল">
+                    <Textarea value={draft.cta?.subtitle || ""} onChange={e => setDraft({ ...draft, cta: { ...draft.cta!, subtitle: e.target.value }})} />
+                  </Field>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </TabsContent>
 
         {/* Counters */}
         <TabsContent value="counters">
           <SectionShell
-            title="কাউন্টার সেকশন"
+            title="কাউন্টার (পরিসংখ্যান)"
             enabled={draft.counters.enabled}
             onEnabledChange={(v) =>
               setDraft({ ...draft, counters: { ...draft.counters, enabled: v } })
@@ -74,6 +230,10 @@ const AdminHomepage = () => {
             sectionTitle={draft.counters.title || ""}
             onSectionTitleChange={(v) =>
               setDraft({ ...draft, counters: { ...draft.counters, title: v } })
+            }
+            sectionSubtitle={draft.counters.subtitle || ""}
+            onSectionSubtitleChange={(v) =>
+              setDraft({ ...draft, counters: { ...draft.counters, subtitle: v } })
             }
             onAdd={() =>
               setDraft({
@@ -142,7 +302,7 @@ const AdminHomepage = () => {
         {/* Categories */}
         <TabsContent value="categories">
           <SectionShell
-            title="ক্যাটাগরি গ্রিড"
+            title="জনপ্রিয় ক্যাটাগরি"
             enabled={draft.categories.enabled}
             onEnabledChange={(v) =>
               setDraft({ ...draft, categories: { ...draft.categories, enabled: v } })
@@ -150,6 +310,10 @@ const AdminHomepage = () => {
             sectionTitle={draft.categories.title || ""}
             onSectionTitleChange={(v) =>
               setDraft({ ...draft, categories: { ...draft.categories, title: v } })
+            }
+            sectionSubtitle={draft.categories.subtitle || ""}
+            onSectionSubtitleChange={(v) =>
+              setDraft({ ...draft, categories: { ...draft.categories, subtitle: v } })
             }
             onAdd={() =>
               setDraft({
@@ -218,7 +382,7 @@ const AdminHomepage = () => {
         {/* Testimonials */}
         <TabsContent value="testimonials">
           <SectionShell
-            title="টেস্টিমোনিয়াল স্লাইডার"
+            title="শিক্ষার্থীদের মতামত"
             enabled={draft.testimonials.enabled}
             onEnabledChange={(v) =>
               setDraft({ ...draft, testimonials: { ...draft.testimonials, enabled: v } })
@@ -226,6 +390,10 @@ const AdminHomepage = () => {
             sectionTitle={draft.testimonials.title || ""}
             onSectionTitleChange={(v) =>
               setDraft({ ...draft, testimonials: { ...draft.testimonials, title: v } })
+            }
+            sectionSubtitle={draft.testimonials.subtitle || ""}
+            onSectionSubtitleChange={(v) =>
+              setDraft({ ...draft, testimonials: { ...draft.testimonials, subtitle: v } })
             }
             onAdd={() =>
               setDraft({
@@ -317,6 +485,10 @@ const AdminHomepage = () => {
             onSectionTitleChange={(v) =>
               setDraft({ ...draft, partners: { ...draft.partners, title: v } })
             }
+            sectionSubtitle={draft.partners.subtitle || ""}
+            onSectionSubtitleChange={(v) =>
+              setDraft({ ...draft, partners: { ...draft.partners, subtitle: v } })
+            }
             onAdd={() =>
               setDraft({
                 ...draft,
@@ -403,6 +575,8 @@ const SectionShell = ({
   onEnabledChange,
   sectionTitle,
   onSectionTitleChange,
+  sectionSubtitle,
+  onSectionSubtitleChange,
   onAdd,
   children,
 }: {
@@ -411,6 +585,8 @@ const SectionShell = ({
   onEnabledChange: (v: boolean) => void;
   sectionTitle: string;
   onSectionTitleChange: (v: string) => void;
+  sectionSubtitle?: string;
+  onSectionSubtitleChange?: (v: string) => void;
   onAdd: () => void;
   children: React.ReactNode;
 }) => (
@@ -427,9 +603,16 @@ const SectionShell = ({
         <Switch id={`en-${title}`} checked={enabled} onCheckedChange={onEnabledChange} />
       </div>
     </div>
-    <Field label="সেকশনের শিরোনাম">
-      <Input value={sectionTitle} onChange={(e) => onSectionTitleChange(e.target.value)} />
-    </Field>
+    <div className="grid gap-4 md:grid-cols-2">
+      <Field label="সেকশনের শিরোনাম">
+        <Input value={sectionTitle} onChange={(e) => onSectionTitleChange(e.target.value)} />
+      </Field>
+      {onSectionSubtitleChange && (
+        <Field label="সেকশনের সাবটাইটেল">
+          <Input value={sectionSubtitle || ""} onChange={(e) => onSectionSubtitleChange(e.target.value)} />
+        </Field>
+      )}
+    </div>
     <div className="space-y-3">{children}</div>
     <Button variant="outline" onClick={onAdd} className="w-full">
       <Plus className="h-4 w-4 mr-2" /> নতুন আইটেম যোগ করুন

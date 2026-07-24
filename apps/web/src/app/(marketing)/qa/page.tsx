@@ -3,6 +3,7 @@ import { Link } from "@/lib/navigation";
 import { getQaPosts } from "@/server/actions/qa.actions";
 import { getQaCategories } from "@/server/actions/qa-category.actions";
 import SharedNavbar from "@/components/shared/navbar";
+import SharedFooter from "@/components/shared/footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -134,6 +135,7 @@ export default async function QaHomepage() {
           </div>
         </div>
       </div>
+      <SharedFooter />
     </div>
   );
 }

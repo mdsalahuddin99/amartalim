@@ -224,10 +224,12 @@ model Comment {
 
 // ─── LMS ───────────────────────────────────────────
 model CourseCategory {
-  id      String   @id @default(cuid())
-  name    String
-  slug    String   @unique
-  courses Course[]
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  image       String?
+  courses     Course[]
 }
 
 model Course {
